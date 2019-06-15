@@ -7,48 +7,65 @@ Created on Mon May 20 14:40:10 2019
 """
 
 import numpy as np
-import pandas as pd
-
 class Regression(object):
-    def __init__(self):
+    def __init__(self, alpha = None):
+        self.alpha = alpha
         return
     
-    def fit_predict(self, X, Y):
+    def fit(self, X, Y):
         self.X = X
         self.Y = Y
-        #--either beta syntax below would work
-        #beta = np.linalg.solve(np.dot(self.X.T, self.X), np.dot(self.X.T, self.Y))
-        beta = np.linalg.inv(self.X.T.dot(self.X)).dot(self.X.T).dot(self.Y)
-        Y_hat = self.X.dot(beta)
+        #--Closed form
+        if not self.alpha:
+            self.beta = np.linalg.solve(self.X.T.dot(self.X), self.X.T.dot(self.Y))
+        else:
+            self.beta = np.linalg.solve(self.alpha*np.eye(self.X.shape[1]) + self.X.T.dot(self.X), self.X.T.dot(self.Y))
+        return self
+        
+    def predict(self, X):
+        Y_hat = X.dot(self.beta)
         return Y_hat
     
-    #-Mean Square Error
+    #-Root Mean Square Error
     def RMSE(self, yh, y):
-        return np.sqrt(np.square(yh - y).mean())
+        return np.sqrt(self.MSE(yh, y))
     #-Mean Square Error
     def MSE(self, yh, y):
         return np.square(yh - y).mean()
     #-Mean Absolute Error
     def MAE(self, yh, y):
         return np.abs(yh - y).mean()
+    #-Median Absolute Error
+    def MDAE(self, yh, y):
+        return np.median(np.abs(yh - y))
+    #-Mean Squared Log Error
+    def MSLE(self, yh, y):
+        return np.mean(np.square((np.log(y + 1)-np.log(yh + 1))))
     #-R-squared Error
     def R_squared(self, yh, y):
         #-- R_square = 1 - (SS[reg]/SS[total])
-        # 1 - (y-yh).dot(y-yh)/(y - y.mean()).dot(y - y.mean()) OR
         return (1 -(np.sum(np.square(y - yh))/np.sum(np.square(y - y.mean()))))
+    #--Explained Variance score
+    def explainedVariance(self, yh, y):
+        e = y - yh
+        return (1 - ((np.sum(np.square(e - np.mean(e))))/(np.sum(np.square(y - y.mean())))))
         
-    def summary(self, X, y, y_hat):
+    def summary(self, y, y_hat):
         #y_hat = self.fit_predict(self.X, self.Y)
         print('*'*40)
         print('\t\tSummary')
         print('*'*40)
-        print('RMSE: %s'%(self.RMSE(y_hat,  Y)))
+        print('RMSE: %s'%(self.RMSE(y_hat,  y)))
         print('*'*40)
-        print('MSE: %s'%(self.MSE(y_hat,  Y)))
+        print('MSE: %s'%(self.MSE(y_hat,  y)))
         print('*'*40)
-        print('MAE: %s'%(self.MAE(y_hat,  Y)))
+        print('MAE: %s'%(self.MAE(y_hat,  y)))
         print('*'*40)
-        print('R_squared = %s'%(self.R_squared(y_hat,  Y)))
+        print('MDAE: %s'%(self.MDAE(y_hat,  y)))
+        print('*'*40)
+        print('R_squared = %s'%(self.R_squared(y_hat,  y)))
+        print('*'*40)
+        print('Explained Variance = %s'%(self.explainedVariance(y_hat,  y)))
         print('*'*40)
     
     def plot(self, X, Y, y_hat):
@@ -313,35 +330,33 @@ features = ['Area m2',
 
 import statsmodels.api as sm
 X = df_standard_no_out[features]
-X = np.c_[np.ones((X.shape[0], 1)), X]    
+X = np.c_[np.ones((X.shape[0], 1)), X]   
 Y = df_standard_no_out[['Price']].values
 
 #--Multivariant regression
 lm = Regression()
 yhat = lm.fit_predict(X, Y)
-lm.summary(X, Y, yhat)
+lm.summary(Y, yhat)
 gd.plot(X[:200], Y[:200], y_hat[:200])
 
 #--Gradient descent
 iterations = 1000
 gd = GradientDescent()
 beta,cost_rec,theta_rec, yhat, stopping = gd.GD(X, Y, beta = np.zeros(X.shape[1]).reshape(-1, 1), alpha = 0.1, iterations = iterations, early_stopping=True)
-gd.summary(X, Y, yhat)
+gd.summary(Y, yhat)
 gd.plot_cost(cost_rec, stopping)
 
 #--stochastic gradient descent
 stgrad = StochasticGradientDescent()
 beta,cost_rec, yhat, stopping = stgrad.StochGD(X, Y, beta = np.zeros(X.shape[1]).reshape(-1, 1), alpha = 0.8, iterations = iterations, early_stopping=True)
-stgrad.summary(X, Y, yhat)
+stgrad.summary(Y, yhat)
 stgrad.plot_cost(cost_rec, stopping)
 
 #--minibatch gradient descent
 minibatch = MinibatchGradientDescent()
 beta,cost_rec, yhat, stopping = minibatch.minbatchGD(X, Y, beta = np.zeros(X.shape[1]).reshape(-1, 1), alpha = 0.01, iterations = iterations, batch_size = 20, early_stopping=True)
-minibatch.summary(X, Y, yhat)
+minibatch.summary(Y, yhat)
 minibatch.plot_cost(cost_rec, stopping)
-
-#%% ADDISTIONAL FEATURES FOR REGRESSION
 
 
 
