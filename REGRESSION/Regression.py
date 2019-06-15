@@ -8,18 +8,14 @@ Created on Mon May 20 14:40:10 2019
 
 import numpy as np
 class Regression(object):
-    def __init__(self, alpha = None):
-        self.alpha = alpha
+    def __init__(self):
         return
     
     def fit(self, X, Y):
         self.X = X
         self.Y = Y
         #--Closed form
-        if not self.alpha:
-            self.beta = np.linalg.solve(self.X.T.dot(self.X), self.X.T.dot(self.Y))
-        else:
-            self.beta = np.linalg.solve(self.alpha*np.eye(self.X.shape[1]) + self.X.T.dot(self.X), self.X.T.dot(self.Y))
+        self.beta = np.linalg.solve(self.X.T.dot(self.X), self.X.T.dot(self.Y))
         return self
         
     def predict(self, X):
@@ -51,7 +47,6 @@ class Regression(object):
         return (1 - ((np.sum(np.square(e - np.mean(e))))/(np.sum(np.square(y - y.mean())))))
         
     def summary(self, y, y_hat):
-        #y_hat = self.fit_predict(self.X, self.Y)
         print('*'*40)
         print('\t\tSummary')
         print('*'*40)
@@ -76,6 +71,25 @@ class Regression(object):
         plt.title('True vlaue vs Predicted value')
         plt.xlabel('Data point')
         plt.ylabel('True vlaue vs Predicted value')
+
+
+class Ridge(Regression):
+    def __init__(self, lamda = None):
+        super().__init__()
+        self.lamda = lamda
+        return
+    
+    def fit(self, X, Y):
+        self.X = X
+        self.Y = Y
+        #--Closed form
+        self.beta = np.linalg.solve(self.lamda*np.eye(self.X.shape[1]) + self.X.T.dot(self.X), self.X.T.dot(self.Y))
+        return self
+        
+    def predict(self, X):
+        Y_hat = X.dot(self.beta)
+        return Y_hat
+    
         
 class GradientDescent(Regression):
     '''
@@ -140,6 +154,72 @@ class GradientDescent(Regression):
         plt.xlabel('Iteration')
         plt.ylabel('Cost')
         plt.show()
+
+class RidgeGradientDescent(Regression):
+    '''
+    Inherits Regression class
+    '''
+    def __init__(self, lamda):
+        self.lamda = 0.01
+        super().__init__()
+        return
+    
+    def cost(self, X, Y, beta):
+        '''
+        param: X = training examples/data. column vector <x1, x2, ...., xn | x E R^D>
+        param: Y = target. vector  <y | y E R^DX1>
+        param: beta = coefficients, e.g b0, b1
+        Return: cost
+        '''
+        return (1/2*len(Y)) * (np.sum(np.square(X.dot(beta) - Y)) + (self.lamda*beta))
+    
+    def RGD(self, X, Y, beta, alpha, iterations, early_stopping = None):
+        '''
+        param: X = NxD feature matrix
+        param: Y = Dx1 column vector
+        param: beta = Dx1 beta vector coefficients
+        param: alpha = learning rate. Default 1e-2
+        param: iterations = Number of times to run. Default 1000
+        
+        Return type; final beta/coefficients, cost and bata iterations
+        '''
+        cost_rec = np.zeros(iterations)
+        beta_rec = np.zeros((iterations, X.shape[1]))
+        if early_stopping:
+            for ii in range(iterations):
+                #compute gradient
+                beta = beta - (1/len(Y)) *(alpha) * ((np.dot(X.T, (np.dot(X,beta) - Y))) + (self.lamda*beta))
+                beta_rec[ii, :] = beta.T
+                cost_rec[ii] = self.cost(X, Y, beta)
+                print('*'*40)
+                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))
+                #--compare last and previous value. stop if they are the same
+                if not cost_rec[ii] == cost_rec[ii -1]:
+                    continue
+                else:
+                    break
+            y_hat = X.dot(beta)
+            return beta, cost_rec[:ii], beta_rec, y_hat, ii
+        else:
+            for ii in range(iterations):
+                #compute gradient
+                beta = beta - (1/len(Y)) *(alpha) * ((np.dot(X.T, (np.dot(X,beta) - Y))) + (self.lamda*beta))
+                beta_rec[ii, :] = beta.T
+                cost_rec[ii] = self.cost(X, Y, beta)
+                print('*'*40)
+                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))
+            print('*'*40)
+            y_hat = X.dot(beta)
+            return beta, cost_rec, beta_rec, y_hat, ii
+        
+    def plot_cost(self, cost, iter_):
+        import matplotlib.pyplot as plt
+        plt.plot(np.arange(iter_), cost)
+        plt.title('Cost vs Number of iteration')
+        plt.xlabel('Iteration')
+        plt.ylabel('Cost')
+        plt.show()
+        
         
 class StochasticGradientDescent(Regression):
     '''
@@ -153,7 +233,7 @@ class StochasticGradientDescent(Regression):
         '''
         param: X = training examples/data. column vector <x1, x2, ...., xn | x E R^D>
         param: Y = target. vector  <y | y E R^DX1>
-        param: beta = coefficients, e.g b0, b1
+        param: beta = coefficients, e.g b0, b1(1/2*len(Y)) * np.sum(np.square(X.dot(beta) - Y))
         Return: cost
         '''
         return (1/2*len(Y)) * np.sum(np.square(X.dot(beta) - Y))
@@ -220,6 +300,86 @@ class StochasticGradientDescent(Regression):
         plt.ylabel('Cost')
         plt.show()
         
+class RidgeStochasticGradientDescent(Regression):
+    '''
+    Inherits Regression class
+    '''
+    def __init__(self, lamda):
+        self.lamda = 0.01
+        super().__init__()
+        return
+    
+    def cost(self, X, Y, beta):
+        '''
+        param: X = training examples/data. column vector <x1, x2, ...., xn | x E R^D>
+        param: Y = target. vector  <y | y E R^DX1>
+        param: beta = coefficients, e.g b0, b1(1/2*len(Y)) * np.sum(np.square(X.dot(beta) - Y))
+        Return: cost
+        '''
+        return (1/2*len(Y)) * (np.sum(np.square(X.dot(beta) - Y)) + (self.lamda*beta))
+    
+    def RStochGD(self, X, Y, beta, alpha, iterations, early_stopping = None):
+        '''
+        param: X = NxD feature matrix
+        param: Y = Dx1 column vector
+        param: beta = Dx1 beta vector coefficients
+        param: alpha = learning rate. Default 1e-2
+        param: iterations = Number of times to run. Default 1000
+        
+        Return type; final beta/coefficients, cost and bata iterations
+        '''
+        cost_rec = np.zeros(iterations)
+        len_y = len(Y)
+        if early_stopping:
+            for ii in range(iterations):
+                #compute gradient
+                cost_val = []
+                for ij in range(len_y):
+                    random_samples = np.random.randint(1, len_y)
+                    X_samp = X[:random_samples]
+                    Y_samp = Y[:random_samples]
+                    beta = beta - (1/len(Y_samp)) *(alpha) * ((np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp))) + (self.lamda*beta))
+                    cost_val.append(self.cost(X_samp, Y_samp, beta))
+                    if cost_val[ij] == cost_val[ij -1]:
+                        break
+                    else:
+                        continue
+                cost_rec[ii] = np.average(cost_val)
+                print('*'*40)
+                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
+                #--compare last and previous value. stop if they are the same
+                if not cost_rec[ii] == cost_rec[ii -1]:
+                    continue
+                else:
+                    break
+            print('*'*40)
+            y_hat = X.dot(beta)
+            return beta, cost_rec[:ii], y_hat, ii
+        else:
+            for ii in range(iterations):
+                #compute gradient
+                cost_val = 0.0
+                for ij in range(len_y):
+                    random_samples = np.random.randint(1, len_y)
+                    X_samp = X[:random_samples]
+                    Y_samp = Y[:random_samples]
+                    beta = beta - (1/len(Y_samp)) *(alpha) * ((np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp))) + (self.lamda*beta))
+                    cost_val += self.cost(X_samp, Y_samp, beta)
+                cost_rec[ii] = cost_val
+                print('*'*40)
+                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
+            print('*'*40)
+            y_hat = X.dot(beta)
+            return beta, cost_rec, y_hat, ii
+        
+    def plot_cost(self, cost, iter_):
+        import matplotlib.pyplot as plt
+        plt.plot(np.arange(iter_), cost)
+        plt.title('Cost vs Number of iteration')
+        plt.xlabel('Iteration')
+        plt.ylabel('Cost')
+        plt.show()
+        
 class MinibatchGradientDescent(Regression):
     '''
     Inherits Regression class
@@ -263,10 +423,10 @@ class MinibatchGradientDescent(Regression):
                     Y_samp = Y_random[ij:ij+batch_size]
                     beta = beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp)))
                     cost_val += self.cost(X_samp, Y_samp, beta)
-#                    if cost_val[ij] == cost_val[ij -1]:
-#                        break
-#                    else:
-#                        continue
+                    if cost_val[ij] == cost_val[ij -1]:
+                        break
+                    else:
+                        continue
                 cost_rec[ii] = cost_val #np.average(cost_val)
                 print('*'*40)
                 print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
@@ -290,6 +450,89 @@ class MinibatchGradientDescent(Regression):
                     X_samp = X_random[ij:ij+batch_size]
                     Y_samp = Y_random[ij:ij+batch_size]
                     beta = beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp)))
+                    cost_val += self.cost(X_samp, Y_samp, beta)
+                cost_rec[ii] = cost_val 
+                print('*'*40)
+                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
+            print('*'*40)
+            y_hat = X.dot(beta)
+            return beta, cost_rec, y_hat, ii
+        
+    def plot_cost(self, cost, iter_):
+        import matplotlib.pyplot as plt
+        plt.plot(np.arange(iter_), cost)
+        plt.title('Cost vs Number of iteration')
+        plt.xlabel('Iteration')
+        plt.ylabel('Cost')
+        plt.show()
+        
+
+class RidgeMinibatchGradientDescent(Regression):
+    '''
+    Inherits Regression class
+    '''
+    def __init__(self, lamda):
+        self.lamda = 0.01
+        super().__init__()
+        return
+    
+    def cost(self, X, Y, beta):
+        '''
+        param: X = training examples/data. column vector <x1, x2, ...., xn | x E R^D>
+        param: Y = target. vector  <y | y E R^DX1>
+        param: beta = coefficients, e.g b0, b1
+        Return: cost
+        '''
+        return (1/2*len(Y)) * (np.sum(np.square(X.dot(beta) - Y)) + (self.lamda*beta))
+    
+    def RidgeminbatchGD(self, X, Y, beta, alpha, iterations, batch_size = None, early_stopping = None):
+        '''
+        param: X = NxD feature matrix
+        param: Y = Dx1 column vector
+        param: beta = Dx1 beta vector coefficients
+        param: alpha = learning rate. Default 1e-2
+        param: iterations = Number of times to run. Default 1000
+        Return type; final beta/coefficients, cost and bata iterations
+        '''
+        cost_rec = np.zeros(iterations)
+        len_y = len(Y)
+        number_batches = int(len_y/batch_size)
+        if early_stopping:
+            for ii in range(iterations):
+                cost_val = 0
+                #randomize dataset using permutation
+                random_samples = np.random.permutation(len_y)
+                X_random = X[random_samples]
+                Y_random = Y[random_samples]
+                for ij in range(0, len_y, number_batches):
+                    #split into batches
+                    X_samp = X_random[ij:ij+batch_size]
+                    Y_samp = Y_random[ij:ij+batch_size]
+                    beta = beta - (1/len(Y_samp)) *(alpha) * ((np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp))) + (self.lamda*beta))
+                    cost_val += self.cost(X_samp, Y_samp, beta)
+                cost_rec[ii] = cost_val #np.average(cost_val)
+                print('*'*40)
+                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
+                #--compare last and previous value. stop if they are the same
+                if not cost_rec[ii] == cost_rec[ii -1]:
+                    continue
+                else:
+                    break
+            print('*'*40)
+            y_hat = X.dot(beta)
+            return beta, cost_rec[:ii], y_hat, ii
+        else:
+            for ii in range(iterations):
+                cost_val = 0
+                #randomize dataset using permutation
+                random_samples = np.random.permutation(len_y)
+                X_random = X[random_samples]
+                Y_random = Y[random_samples]
+                for ij in range(0, len_y, number_batches):
+                    #split into batches
+                    X_samp = X_random[ij:ij+batch_size]
+                    Y_samp = Y_random[ij:ij+batch_size]
+                    beta = beta - (1/len(Y_samp)) *(alpha) * ((np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp))) + (self.lamda*beta))
                     cost_val += self.cost(X_samp, Y_samp, beta)
                 cost_rec[ii] = cost_val 
                 print('*'*40)
