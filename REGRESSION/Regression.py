@@ -110,43 +110,48 @@ class GradientDescent(Regression):
     
     def GD(self, X, Y, beta, alpha, iterations, early_stopping = None):
         '''
-        param: X = NxD feature matrix
-        param: Y = Dx1 column vector
+        param: X_train = NxD feature matrix
+        param: Y_train = Dx1 column vector
         param: beta = Dx1 beta vector coefficients
         param: alpha = learning rate. Default 1e-2
         param: iterations = Number of times to run. Default 1000
         
         Return type; final beta/coefficients, cost and bata iterations
         '''
-        cost_rec = np.zeros(iterations)
-        beta_rec = np.zeros((iterations, X.shape[1]))
+        self.beta = beta
+        self.cost_rec = np.zeros(iterations)
+        self.beta_rec = np.zeros((iterations, X.shape[1]))
         if early_stopping:
-            for ii in range(iterations):
+            for self.iter in range(iterations):
                 #compute gradient
-                beta = beta - (1/len(Y)) *(alpha) * (np.dot(X.T, (np.dot(X,beta) - Y)))
-                beta_rec[ii, :] = beta.T
-                cost_rec[ii] = self.cost(X, Y, beta)
+                self.beta = self.beta - (1/len(Y)) *(alpha) * (np.dot(X.T, (np.dot(X, self.beta) - Y)))
+                self.beta_rec[self.iter, :] = self.beta.T
+                self.cost_rec[self.iter] = self.cost(X, Y, self.beta)
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))
+                print('%s iteratiion, cost = %s'%(self.iter, self.cost_rec[self.iter]))
                 #--compare last and previous value. stop if they are the same
-                if not cost_rec[ii] == cost_rec[ii -1]:
+                if not self.cost_rec[self.iter] == self.cost_rec[self.iter -1]:
                     continue
                 else:
                     break
-            y_hat = X.dot(beta)
-            return beta, cost_rec[:ii], beta_rec, y_hat, ii
+            return self
         else:
             for ii in range(iterations):
                 #compute gradient
-                beta = beta - (1/len(Y)) *(alpha) * (np.dot(X.T, (np.dot(X,beta) - Y)))
-                beta_rec[ii, :] = beta.T
-                cost_rec[ii] = self.cost(X, Y, beta)
+                self.beta = self.beta - (1/len(Y)) *(alpha) * (np.dot(X.T, (np.dot(X,self.beta) - Y)))
+                self.beta_rec[ii, :] = beta.T
+                self.cost_rec[ii] = self.cost(X, Y, self.beta)
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))
+                print('%s iteratiion, cost = %s'%(ii, self.cost_rec[ii]))
             print('*'*40)
-            y_hat = X.dot(beta)
-            return beta, cost_rec, beta_rec, y_hat, ii
+            return self
         
+    def predict(self, X):
+        '''
+        param: X_test = NxD feature matrix
+        '''
+        return X.dot(self.beta)
+    
     def plot_cost(self, cost, iter_):
         import matplotlib.pyplot as plt
         plt.plot(np.arange(iter_), cost)
@@ -171,7 +176,7 @@ class RidgeGradientDescent(Regression):
         param: beta = coefficients, e.g b0, b1
         Return: cost
         '''
-        return (1/2*len(Y)) * (np.sum(np.square(X.dot(beta) - Y)) + (self.lamda*beta))
+        return (1/2*len(Y)) * (np.sum(np.square(X.dot(beta) - Y)) + (self.lamda*np.sum(np.square(beta))))
     
     def RGD(self, X, Y, beta, alpha, iterations, early_stopping = None):
         '''
@@ -183,35 +188,40 @@ class RidgeGradientDescent(Regression):
         
         Return type; final beta/coefficients, cost and bata iterations
         '''
-        cost_rec = np.zeros(iterations)
-        beta_rec = np.zeros((iterations, X.shape[1]))
+        self.beta = beta
+        self.cost_rec = np.zeros(iterations)
+        self.beta_rec = np.zeros((iterations, X.shape[1]))
         if early_stopping:
-            for ii in range(iterations):
+            for self.iter in range(iterations):
                 #compute gradient
-                beta = beta - (1/len(Y)) *(alpha) * ((np.dot(X.T, (np.dot(X,beta) - Y))) + (self.lamda*beta))
-                beta_rec[ii, :] = beta.T
-                cost_rec[ii] = self.cost(X, Y, beta)
+                self.beta = self.beta - (1/len(Y)) *(alpha) * ((np.dot(X.T, (np.dot(X, self.beta) - Y))) + (self.lamda*self.beta))
+                self.beta_rec[self.iter, :] = self.beta.T
+                self.cost_rec[self.iter] = self.cost(X, Y, self.beta)
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))
+                print('%s iteratiion, cost = %s'%(self.iter, self.cost_rec[self.iter]))
                 #--compare last and previous value. stop if they are the same
-                if not cost_rec[ii] == cost_rec[ii -1]:
+                if not self.cost_rec[self.iter] == self.cost_rec[self.iter -1]:
                     continue
                 else:
                     break
-            y_hat = X.dot(beta)
-            return beta, cost_rec[:ii], beta_rec, y_hat, ii
+            return self
         else:
-            for ii in range(iterations):
+            for self.iter in range(iterations):
                 #compute gradient
-                beta = beta - (1/len(Y)) *(alpha) * ((np.dot(X.T, (np.dot(X,beta) - Y))) + (self.lamda*beta))
-                beta_rec[ii, :] = beta.T
-                cost_rec[ii] = self.cost(X, Y, beta)
+                self.beta = self.beta - (1/len(Y)) *(alpha) * ((np.dot(X.T, (np.dot(X, self.beta) - Y))) + (self.lamda*self.beta))
+                self.beta_rec[self.iter, :] = self.beta.T
+                self.cost_rec[self.iter] = self.cost(X, Y, self.beta)
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))
+                print('%s iteratiion, cost = %s'%(self.iter, self.cost_rec[self.iter]))
             print('*'*40)
-            y_hat = X.dot(beta)
-            return beta, cost_rec, beta_rec, y_hat, ii
-        
+            return self
+            
+    def predict(self, X):
+        '''
+        param: X_test = NxD feature matrix
+        '''
+        return X.dot(self.beta)
+    
     def plot_cost(self, cost, iter_):
         import matplotlib.pyplot as plt
         plt.plot(np.arange(iter_), cost)
@@ -248,50 +258,55 @@ class StochasticGradientDescent(Regression):
         
         Return type; final beta/coefficients, cost and bata iterations
         '''
-        cost_rec = np.zeros(iterations)
+        self.beta = beta
+        self.cost_rec = np.zeros(iterations)
         len_y = len(Y)
         if early_stopping:
-            for ii in range(iterations):
+            for self.iter in range(iterations):
                 #compute gradient
                 cost_val = []
                 for ij in range(len_y):
                     random_samples = np.random.randint(1, len_y)
                     X_samp = X[:random_samples]
                     Y_samp = Y[:random_samples]
-                    beta = beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp)))
-                    cost_val.append(self.cost(X_samp, Y_samp, beta))
+                    self.beta = self.beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp)))
+                    cost_val.append(self.cost(X_samp, Y_samp, self.beta))
                     if cost_val[ij] == cost_val[ij -1]:
                         break
                     else:
                         continue
-                cost_rec[ii] = np.average(cost_val)
+                cost_rec[self.iter] = np.average(cost_val)
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
+                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
                 #--compare last and previous value. stop if they are the same
-                if not cost_rec[ii] == cost_rec[ii -1]:
+                if not cost_rec[self.iter] == cost_rec[self.iter -1]:
                     continue
                 else:
                     break
             print('*'*40)
-            y_hat = X.dot(beta)
-            return beta, cost_rec[:ii], y_hat, ii
+            return self
         else:
-            for ii in range(iterations):
+            for self.iter in range(iterations):
                 #compute gradient
                 cost_val = 0.0
                 for ij in range(len_y):
                     random_samples = np.random.randint(1, len_y)
                     X_samp = X[:random_samples]
                     Y_samp = Y[:random_samples]
-                    beta = beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp)))
-                    cost_val += self.cost(X_samp, Y_samp, beta)
-                cost_rec[ii] = cost_val
+                    self.beta = beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp)))
+                    cost_val += self.cost(X_samp, Y_samp, self.beta)
+                self.cost_rec[self.iter] = cost_val
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
+                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
             print('*'*40)
-            y_hat = X.dot(beta)
-            return beta, cost_rec, y_hat, ii
+            return self
         
+    def predict(self, X):
+        '''
+        param: X_test = NxD feature matrix
+        '''
+        return X.dot(self.beta)
+    
     def plot_cost(self, cost, iter_):
         import matplotlib.pyplot as plt
         plt.plot(np.arange(iter_), cost)
@@ -316,7 +331,7 @@ class RidgeStochasticGradientDescent(Regression):
         param: beta = coefficients, e.g b0, b1(1/2*len(Y)) * np.sum(np.square(X.dot(beta) - Y))
         Return: cost
         '''
-        return (1/2*len(Y)) * (np.sum(np.square(X.dot(beta) - Y)) + (self.lamda*beta))
+        return (1/2*len(Y)) * (np.sum(np.square(X.dot(beta) - Y)) + (self.lamda*np.sum(np.square(beta))))
     
     def RStochGD(self, X, Y, beta, alpha, iterations, early_stopping = None):
         '''
@@ -328,50 +343,55 @@ class RidgeStochasticGradientDescent(Regression):
         
         Return type; final beta/coefficients, cost and bata iterations
         '''
-        cost_rec = np.zeros(iterations)
+        self.beta = beta
+        self.cost_rec = np.zeros(iterations)
         len_y = len(Y)
         if early_stopping:
-            for ii in range(iterations):
+            for self.iter in range(iterations):
                 #compute gradient
                 cost_val = []
                 for ij in range(len_y):
                     random_samples = np.random.randint(1, len_y)
                     X_samp = X[:random_samples]
                     Y_samp = Y[:random_samples]
-                    beta = beta - (1/len(Y_samp)) *(alpha) * ((np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp))) + (self.lamda*beta))
-                    cost_val.append(self.cost(X_samp, Y_samp, beta))
+                    self.beta = self.beta - (1/len(Y_samp)) *(alpha) * ((np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp))) + (self.lamda*self.beta))
+                    cost_val.append(self.cost(X_samp, Y_samp, self.beta))
                     if cost_val[ij] == cost_val[ij -1]:
                         break
                     else:
                         continue
-                cost_rec[ii] = np.average(cost_val)
+                cost_rec[self.iter] = np.average(cost_val)
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
+                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
                 #--compare last and previous value. stop if they are the same
-                if not cost_rec[ii] == cost_rec[ii -1]:
+                if not cost_rec[self.iter] == cost_rec[self.iter -1]:
                     continue
                 else:
                     break
             print('*'*40)
-            y_hat = X.dot(beta)
-            return beta, cost_rec[:ii], y_hat, ii
+            return self
         else:
-            for ii in range(iterations):
+            for self.iter in range(iterations):
                 #compute gradient
                 cost_val = 0.0
                 for ij in range(len_y):
                     random_samples = np.random.randint(1, len_y)
                     X_samp = X[:random_samples]
                     Y_samp = Y[:random_samples]
-                    beta = beta - (1/len(Y_samp)) *(alpha) * ((np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp))) + (self.lamda*beta))
-                    cost_val += self.cost(X_samp, Y_samp, beta)
-                cost_rec[ii] = cost_val
+                    self.beta = self.beta - (1/len(Y_samp)) *(alpha) * ((np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp))) + (self.lamda*self.beta))
+                    cost_val += self.cost(X_samp, Y_samp, self.beta)
+                self.cost_rec[self.iter] = cost_val
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
+                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
             print('*'*40)
-            y_hat = X.dot(beta)
-            return beta, cost_rec, y_hat, ii
+            return self
         
+    def predict(self, X):
+        '''
+        param: X_test = NxD feature matrix
+        '''
+        return X.dot(self.beta)
+    
     def plot_cost(self, cost, iter_):
         import matplotlib.pyplot as plt
         plt.plot(np.arange(iter_), cost)
@@ -407,57 +427,62 @@ class MinibatchGradientDescent(Regression):
         
         Return type; final beta/coefficients, cost and bata iterations
         '''
-        cost_rec = np.zeros(iterations)
+        self.beta = beta
+        self.cost_rec = np.zeros(iterations)
         len_y = len(Y)
-        number_batches = int(len_y/batch_size)
+        self.number_batches = int(len_y/batch_size)
         if early_stopping:
-            for ii in range(iterations):
+            for self.iter in range(iterations):
                 cost_val = 0
                 #randomize dataset using permutation
                 random_samples = np.random.permutation(len_y)
                 X_random = X[random_samples]
                 Y_random = Y[random_samples]
-                for ij in range(0, len_y, number_batches):
+                for ij in range(0, len_y, self.number_batches):
                     #split into batches
                     X_samp = X_random[ij:ij+batch_size]
                     Y_samp = Y_random[ij:ij+batch_size]
-                    beta = beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp)))
-                    cost_val += self.cost(X_samp, Y_samp, beta)
+                    self.beta = self.beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp)))
+                    cost_val += self.cost(X_samp, Y_samp, self.beta)
                     if cost_val[ij] == cost_val[ij -1]:
                         break
                     else:
                         continue
-                cost_rec[ii] = cost_val #np.average(cost_val)
+                cost_rec[self.iter] = cost_val #np.average(cost_val)
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
+                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
                 #--compare last and previous value. stop if they are the same
-                if not cost_rec[ii] == cost_rec[ii -1]:
+                if not cost_rec[self.iter] == cost_rec[self.iter -1]:
                     continue
                 else:
                     break
             print('*'*40)
-            y_hat = X.dot(beta)
-            return beta, cost_rec[:ii], y_hat, ii
+            return self
         else:
-            for ii in range(iterations):
+            for self.iter in range(iterations):
                 cost_val = 0
                 #randomize dataset using permutation
                 random_samples = np.random.permutation(len_y)
                 X_random = X[random_samples]
                 Y_random = Y[random_samples]
-                for ij in range(0, len_y, number_batches):
+                for ij in range(0, len_y, self.number_batches):
                     #split into batches
                     X_samp = X_random[ij:ij+batch_size]
                     Y_samp = Y_random[ij:ij+batch_size]
-                    beta = beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp)))
-                    cost_val += self.cost(X_samp, Y_samp, beta)
-                cost_rec[ii] = cost_val 
+                    self.beta = self.beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp)))
+                    cost_val += self.cost(X_samp, Y_samp, self.beta)
+                cost_rec[self.iter] = cost_val 
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
+                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
             print('*'*40)
-            y_hat = X.dot(beta)
-            return beta, cost_rec, y_hat, ii
-        
+            return self
+    
+    def predict(self, X):
+        '''
+        param: X_test = NxD feature matrix
+        '''
+        return X.dot(self.beta)
+    
     def plot_cost(self, cost, iter_):
         import matplotlib.pyplot as plt
         plt.plot(np.arange(iter_), cost)
@@ -483,63 +508,67 @@ class RidgeMinibatchGradientDescent(Regression):
         param: beta = coefficients, e.g b0, b1
         Return: cost
         '''
-        return (1/2*len(Y)) * (np.sum(np.square(X.dot(beta) - Y)) + (self.lamda*beta))
+        return (1/2*len(Y)) * (np.sum(np.square(X.dot(beta) - Y)) + (self.lamda*np.sum(np.square(beta))))
     
-    def RidgeminbatchGD(self, X, Y, beta, alpha, iterations, batch_size = None, early_stopping = None):
+    def ridgeminbatchGD(self, X, Y, beta, alpha, iterations, batch_size = None, early_stopping = None):
         '''
         param: X = NxD feature matrix
         param: Y = Dx1 column vector
         param: beta = Dx1 beta vector coefficients
         param: alpha = learning rate. Default 1e-2
         param: iterations = Number of times to run. Default 1000
+        
         Return type; final beta/coefficients, cost and bata iterations
         '''
-        cost_rec = np.zeros(iterations)
+        self.beta = beta
+        self.cost_rec = np.zeros(iterations)
         len_y = len(Y)
-        number_batches = int(len_y/batch_size)
+        self.number_batches = int(len_y/batch_size)
         if early_stopping:
-            for ii in range(iterations):
+            for self.iter in range(iterations):
                 cost_val = 0
                 #randomize dataset using permutation
                 random_samples = np.random.permutation(len_y)
                 X_random = X[random_samples]
                 Y_random = Y[random_samples]
-                for ij in range(0, len_y, number_batches):
+                for ij in range(0, len_y, self.number_batches):
                     #split into batches
                     X_samp = X_random[ij:ij+batch_size]
                     Y_samp = Y_random[ij:ij+batch_size]
-                    beta = beta - (1/len(Y_samp)) *(alpha) * ((np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp))) + (self.lamda*beta))
-                    cost_val += self.cost(X_samp, Y_samp, beta)
-                cost_rec[ii] = cost_val #np.average(cost_val)
+                    self.beta = self.beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp)))
+                    cost_val += self.cost(X_samp, Y_samp, self.beta)
+                    if cost_val[ij] == cost_val[ij -1]:
+                        break
+                    else:
+                        continue
+                cost_rec[self.iter] = cost_val #np.average(cost_val)
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
+                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
                 #--compare last and previous value. stop if they are the same
-                if not cost_rec[ii] == cost_rec[ii -1]:
+                if not cost_rec[self.iter] == cost_rec[self.iter -1]:
                     continue
                 else:
                     break
             print('*'*40)
-            y_hat = X.dot(beta)
-            return beta, cost_rec[:ii], y_hat, ii
+            return self
         else:
-            for ii in range(iterations):
+            for self.iter in range(iterations):
                 cost_val = 0
                 #randomize dataset using permutation
                 random_samples = np.random.permutation(len_y)
                 X_random = X[random_samples]
                 Y_random = Y[random_samples]
-                for ij in range(0, len_y, number_batches):
+                for ij in range(0, len_y, self.number_batches):
                     #split into batches
                     X_samp = X_random[ij:ij+batch_size]
                     Y_samp = Y_random[ij:ij+batch_size]
-                    beta = beta - (1/len(Y_samp)) *(alpha) * ((np.dot(X_samp.T, (np.dot(X_samp,beta) - Y_samp))) + (self.lamda*beta))
-                    cost_val += self.cost(X_samp, Y_samp, beta)
-                cost_rec[ii] = cost_val 
+                    self.beta = self.beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp)))
+                    cost_val += self.cost(X_samp, Y_samp, self.beta)
+                cost_rec[self.iter] = cost_val 
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(ii, cost_rec[ii]))    
+                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
             print('*'*40)
-            y_hat = X.dot(beta)
-            return beta, cost_rec, y_hat, ii
+            return self
         
     def plot_cost(self, cost, iter_):
         import matplotlib.pyplot as plt
@@ -600,7 +629,6 @@ minibatch = MinibatchGradientDescent()
 beta,cost_rec, yhat, stopping = minibatch.minbatchGD(X, Y, beta = np.zeros(X.shape[1]).reshape(-1, 1), alpha = 0.01, iterations = iterations, batch_size = 20, early_stopping=True)
 minibatch.summary(Y, yhat)
 minibatch.plot_cost(cost_rec, stopping)
-
 
 
 
