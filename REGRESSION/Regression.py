@@ -600,7 +600,6 @@ features = ['Area m2',
              'Living Rooms',
              'Servant Room']
 
-import statsmodels.api as sm
 X = df_standard_no_out[features]
 X = np.c_[np.ones((X.shape[0], 1)), X]   
 Y = df_standard_no_out[['Price']].values
