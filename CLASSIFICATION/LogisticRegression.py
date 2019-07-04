@@ -58,7 +58,7 @@ class Logistic():
                           self.FP(A, P),\
                           self.FN(A, P),\
                           self.TN(A, P))
-        return np.array([[TP, FN], [FP, TN]])
+        return np.array([[TP, FP], [FN, TN]])
     
     def accuracy(self, A, P):
         '''Docstring
@@ -273,6 +273,7 @@ logit.confusionMatrix(Y_test, y_pred)
 stlog = stochasticLogistic(alpha=0.1, iterations=100).fit(X_train, Y_train)
 y_pred = stlog.predict(X_test)
 stlog.summary(Y_test, y_pred)
+stlog.confusionMatrix(Y_test, y_pred)
 
 minilog = minibatchLogistic(alpha=0.1, iterations=100).fit(X_test, Y_test, batchSize= 10)
 y_pred = minilog.predict(X_test)
