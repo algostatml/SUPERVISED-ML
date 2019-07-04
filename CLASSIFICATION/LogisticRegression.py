@@ -12,6 +12,15 @@ class Logistic():
         return
     
     #classification metrics
+    '''
+                            Actual
+                        +ve       -ve
+                    ---------------------
+                +ve |   TP    |     FP  | +---> Precision
+                    --------------------- |
+    predicted   -ve |   FN    |   TN    | v
+                    --------------------- Recall
+    '''
     def TP(self, A, P):
         '''Docstring
         when actual is 1 and prediction is 1
