@@ -89,8 +89,7 @@ class Ridge(Regression):
     def predict(self, X):
         Y_hat = X.dot(self.beta)
         return Y_hat
-    
-        
+
 class GradientDescent(Regression):
     '''
     Inherits Regression class
