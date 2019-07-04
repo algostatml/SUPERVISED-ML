@@ -168,7 +168,7 @@ class stochasticLogistic(Logistic):
         :params: beta: weights N x 1
         
         '''
-        return -(1/len(Y)) * np.sum((Y*np.log(Logistic.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - Logistic.sigmoid(X, beta))))
+        return -(1/len(Y)) * np.sum((Y*np.log(stochasticLogistic.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - stochasticLogistic.sigmoid(X, beta))))
     
     def fit(self, X, Y):
         self.beta = np.zeros(X.shape[1])
@@ -182,7 +182,7 @@ class stochasticLogistic(Logistic):
                 random_samples = np.random.randint(1, ylen)
                 X_samp = X[:random_samples]
                 Y_samp = Y[:random_samples]
-                self.beta = self.beta + (1/len(Y_samp)) *(self.alpha) * X_samp.T.dot(Y_samp - Logistic.sigmoid(X_samp, self.beta))
+                self.beta = self.beta + (1/len(Y_samp)) *(self.alpha) * X_samp.T.dot(Y_samp - stochasticLogistic.sigmoid(X_samp, self.beta))
                 self.beta_rec[ii, :] = self.beta.T
                 sampledCost.append(self.cost(X_samp, Y_samp, self.beta))
             self.cost_rec[ii] = np.average(sampledCost)
@@ -196,7 +196,7 @@ class stochasticLogistic(Logistic):
         '''
         y_pred = np.zeros(X.shape[0])
         for ii in range(len(y_pred)):
-            if Logistic.sigmoid(X[ii], self.beta) > 0.5:
+            if stochasticLogistic.sigmoid(X[ii], self.beta) > 0.5:
                 y_pred[ii] = 1
         return y_pred
 
@@ -224,7 +224,7 @@ class minibatchLogistic(Logistic):
         :params: beta: weights N x 1
         
         '''
-        return -(1/len(Y)) * np.sum((Y*np.log(Logistic.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - Logistic.sigmoid(X, beta))))
+        return -(1/len(Y)) * np.sum((Y*np.log(minibatchLogistic.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - minibatchLogistic.sigmoid(X, beta))))
     
     def fit(self, X, Y, batchSize = None):
         self.beta = np.zeros(X.shape[1])
@@ -241,7 +241,7 @@ class minibatchLogistic(Logistic):
             for ij in range(0, ylen, batchNumber):
                 X_samp = X_random[ij:ij+batchSize]
                 Y_samp = Y_random[ij:ij+batchSize]
-                self.beta = self.beta + (1/len(Y_samp)) *(self.alpha) * X_samp.T.dot(Y_samp - Logistic.sigmoid(X_samp, self.beta))
+                self.beta = self.beta + (1/len(Y_samp)) *(self.alpha) * X_samp.T.dot(Y_samp - minibatchLogistic.sigmoid(X_samp, self.beta))
                 self.beta_rec[ii, :] = self.beta.T
                 sampledCost.append(self.cost(X_samp, Y_samp, self.beta))
             self.cost_rec[ii] = np.average(sampledCost)
@@ -255,7 +255,7 @@ class minibatchLogistic(Logistic):
         '''
         y_pred = np.zeros(X.shape[0])
         for ii in range(len(y_pred)):
-            if Logistic.sigmoid(X[ii], self.beta) > 0.5:
+            if minibatchLogistic.sigmoid(X[ii], self.beta) > 0.5:
                 y_pred[ii] = 1
         return y_pred
     
