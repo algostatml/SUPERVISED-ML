@@ -91,12 +91,48 @@ class Logistic():
         '''
         return self.TP(A, P)/(self.TP(A, P) + self.FN(A, P))
     
+    def TPR(self, A, P):
+        '''Docstring
+        True Positive rate:
+            True Positive Rate corresponds to the 
+            proportion of positive data points that 
+            are correctly considered as positive, 
+            with respect to all positive data points.
+        
+        :params: A: Actual label
+        :params: P: predicted labels
+        '''
+        return self.recall(A, P)
+    
+    def FPR(self, A, P):
+        '''Docstring
+        False Positive rate:
+            False Positive Rate corresponds to the 
+            proportion of negative data points that 
+            are mistakenly considered as positive, 
+            with respect to all negative data points.
+
+        
+        :params: A: Actual label
+        :params: P: predicted labels
+        '''
+        return self.FP(A, P)/(self.FP(A, P) + self.TN(A, P))
+    
+    def TNR(self, A, P):
+        '''Docstring
+        True Negative Rate
+        '''
+        return self.TN(A, P)/(self.TN(A, P) + self.FP(A, P))
+       
     def f1(self, A, P):
         '''Docstring
         :params: A: Actual label
         :params: P: predicted labels
         '''
         return (2 * (self.precision(A, P) * self.recall(A, P)))/(self.precision(A, P) + self.recall(A, P))
+    
+    def MSE(self, yh, y):
+        return np.square(yh - y).mean()
     
     def summary(self, A, P):
         print('*'*40)
@@ -106,6 +142,8 @@ class Logistic():
         print('>> Precision: %s'%self.precision(A, P))
         print('>> Recall: %s'%self.recall(A, P))
         print('>> F1-score: %s'%self.f1(A, P))
+        print('>> True positive rate: %s'%self.TPR(A, P))
+        print('>> False positive rate: %s'%self.FPR(A, P))
         print('*'*40)
         
     @staticmethod
@@ -288,3 +326,5 @@ minilog = minibatchLogistic(alpha=0.1, iterations=100).fit(X_test, Y_test, batch
 y_pred = minilog.predict(X_test)
 minilog.summary(Y_test, y_pred)
 minilog.confusionMatrix(Y_test, y_pred)
+
+
