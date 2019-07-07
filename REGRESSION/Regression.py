@@ -41,11 +41,19 @@ class Regression(object):
     def R_squared(self, yh, y):
         #-- R_square = 1 - (SS[reg]/SS[total])
         return (1 -(np.sum(np.square(y - yh))/np.sum(np.square(y - y.mean()))))
+    def Huber(self, yh, y, delta=None):
+        loss = []
+        if not delta:
+            delta = 1.0
+            loss.append(np.where(np.abs(y - yh) < delta,.5*(y - yh)**2 , delta*(np.abs(y-yh)-0.5*delta)))
+        else:
+            loss.append(np.where(np.abs(y - yh) < delta,.5*(y - yh)**2 , delta*(np.abs(y-yh)-0.5*delta)))
+        return np.array(loss).mean()
     #--Explained Variance score
     def explainedVariance(self, yh, y):
         e = y - yh
         return (1 - ((np.sum(np.square(e - np.mean(e))))/(np.sum(np.square(y - y.mean())))))
-        
+    
     def summary(self, y, y_hat):
         print('*'*40)
         print('\t\tSummary')
@@ -59,6 +67,8 @@ class Regression(object):
         print('MDAE: %s'%(self.MDAE(y_hat,  y)))
         print('*'*40)
         print('R_squared = %s'%(self.R_squared(y_hat,  y)))
+        print('*'*40)
+        print('Huber = %s'%(self.Huber(y_hat,  y)))
         print('*'*40)
         print('Explained Variance = %s'%(self.explainedVariance(y_hat,  y)))
         print('*'*40)
@@ -123,7 +133,7 @@ class GradientDescent(Regression):
         if early_stopping:
             for self.iter in range(iterations):
                 #compute gradient
-                self.beta = self.beta - (1/len(Y)) *(alpha) * (np.dot(X.T, (np.dot(X, self.beta) - Y)))
+                self.beta = beta - (1/len(Y_train)) *(alpha) * (np.dot(X_train.T, (np.dot(X_train, beta) - Y_train)))
                 self.beta_rec[self.iter, :] = self.beta.T
                 self.cost_rec[self.iter] = self.cost(X, Y, self.beta)
                 print('*'*40)
@@ -274,11 +284,11 @@ class StochasticGradientDescent(Regression):
                         break
                     else:
                         continue
-                cost_rec[self.iter] = np.average(cost_val)
+                self.cost_rec[self.iter] = np.average(cost_val)
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
+                print('%s iteratiion, cost = %s'%(self.iter, self.cost_rec[self.iter]))    
                 #--compare last and previous value. stop if they are the same
-                if not cost_rec[self.iter] == cost_rec[self.iter -1]:
+                if not self.cost_rec[self.iter] == self.cost_rec[self.iter -1]:
                     continue
                 else:
                     break
@@ -296,7 +306,7 @@ class StochasticGradientDescent(Regression):
                     cost_val += self.cost(X_samp, Y_samp, self.beta)
                 self.cost_rec[self.iter] = cost_val
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
+                print('%s iteratiion, cost = %s'%(self.iter, self.cost_rec[self.iter]))    
             print('*'*40)
             return self
         
@@ -354,16 +364,16 @@ class RidgeStochasticGradientDescent(Regression):
                     X_samp = X[:random_samples]
                     Y_samp = Y[:random_samples]
                     self.beta = self.beta - (1/len(Y_samp)) *(alpha) * ((np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp))) + (self.lamda*self.beta))
-                    cost_val.append(self.cost(X_samp, Y_samp, self.beta))
-                    if cost_val[ij] == cost_val[ij -1]:
+                    self.cost_val.append(self.cost(X_samp, Y_samp, self.beta))
+                    if self.cost_val[ij] == self.cost_val[ij -1]:
                         break
                     else:
                         continue
-                cost_rec[self.iter] = np.average(cost_val)
+                self.cost_rec[self.iter] = np.average(cost_val)
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
+                print('%s iteratiion, cost = %s'%(self.iter, self.cost_rec[self.iter]))    
                 #--compare last and previous value. stop if they are the same
-                if not cost_rec[self.iter] == cost_rec[self.iter -1]:
+                if not self.cost_rec[self.iter] == self.cost_rec[self.iter -1]:
                     continue
                 else:
                     break
@@ -381,7 +391,7 @@ class RidgeStochasticGradientDescent(Regression):
                     cost_val += self.cost(X_samp, Y_samp, self.beta)
                 self.cost_rec[self.iter] = cost_val
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
+                print('%s iteratiion, cost = %s'%(self.iter, self.cost_rec[self.iter]))    
             print('*'*40)
             return self
         
@@ -432,7 +442,7 @@ class MinibatchGradientDescent(Regression):
         self.number_batches = int(len_y/batch_size)
         if early_stopping:
             for self.iter in range(iterations):
-                cost_val = 0
+                cost_val = []
                 #randomize dataset using permutation
                 random_samples = np.random.permutation(len_y)
                 X_random = X[random_samples]
@@ -442,16 +452,16 @@ class MinibatchGradientDescent(Regression):
                     X_samp = X_random[ij:ij+batch_size]
                     Y_samp = Y_random[ij:ij+batch_size]
                     self.beta = self.beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp)))
-                    cost_val += self.cost(X_samp, Y_samp, self.beta)
+                    cost_val.append(self.cost(X_samp, Y_samp, self.beta))
                     if cost_val[ij] == cost_val[ij -1]:
                         break
                     else:
                         continue
-                cost_rec[self.iter] = cost_val #np.average(cost_val)
+                self.cost_rec[self.iter] = cost_val #np.average(cost_val)
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
+                print('%s iteratiion, cost = %s'%(self.iter, self.cost_rec[self.iter]))    
                 #--compare last and previous value. stop if they are the same
-                if not cost_rec[self.iter] == cost_rec[self.iter -1]:
+                if not self.cost_rec[self.iter] == self.cost_rec[self.iter -1]:
                     continue
                 else:
                     break
@@ -470,9 +480,9 @@ class MinibatchGradientDescent(Regression):
                     Y_samp = Y_random[ij:ij+batch_size]
                     self.beta = self.beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp)))
                     cost_val += self.cost(X_samp, Y_samp, self.beta)
-                cost_rec[self.iter] = cost_val 
+                self.cost_rec[self.iter] = cost_val 
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
+                print('%s iteratiion, cost = %s'%(self.iter, self.cost_rec[self.iter]))    
             print('*'*40)
             return self
     
@@ -535,16 +545,16 @@ class RidgeMinibatchGradientDescent(Regression):
                     X_samp = X_random[ij:ij+batch_size]
                     Y_samp = Y_random[ij:ij+batch_size]
                     self.beta = self.beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp)))
-                    cost_val += self.cost(X_samp, Y_samp, self.beta)
-                    if cost_val[ij] == cost_val[ij -1]:
+                    self.cost_val += self.cost(X_samp, Y_samp, self.beta)
+                    if self.cost_val[ij] == self.cost_val[ij -1]:
                         break
                     else:
                         continue
-                cost_rec[self.iter] = cost_val #np.average(cost_val)
+                self.cost_rec[self.iter] = cost_val #np.average(cost_val)
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
+                print('%s iteratiion, cost = %s'%(self.iter, self.cost_rec[self.iter]))    
                 #--compare last and previous value. stop if they are the same
-                if not cost_rec[self.iter] == cost_rec[self.iter -1]:
+                if not self.cost_rec[self.iter] == self.cost_rec[self.iter -1]:
                     continue
                 else:
                     break
@@ -563,9 +573,9 @@ class RidgeMinibatchGradientDescent(Regression):
                     Y_samp = Y_random[ij:ij+batch_size]
                     self.beta = self.beta - (1/len(Y_samp)) *(alpha) * (np.dot(X_samp.T, (np.dot(X_samp, self.beta) - Y_samp)))
                     cost_val += self.cost(X_samp, Y_samp, self.beta)
-                cost_rec[self.iter] = cost_val 
+                self.cost_rec[self.iter] = cost_val 
                 print('*'*40)
-                print('%s iteratiion, cost = %s'%(self.iter, cost_rec[self.iter]))    
+                print('%s iteratiion, cost = %s'%(self.iter, self.cost_rec[self.iter]))    
             print('*'*40)
             return self
         
@@ -604,29 +614,26 @@ X = np.c_[np.ones((X.shape[0], 1)), X]
 Y = df_standard_no_out[['Price']].values
 
 #--Multivariant regression
-lm = Regression()
-yhat = lm.fit_predict(X, Y)
-lm.summary(Y, yhat)
-gd.plot(X[:200], Y[:200], y_hat[:200])
+lm = Regression().fit(X_train, Y_train)
+yhat = lm.predict(X_test)
+lm.summary(Y_test, yhat)
+gd.plot(X_test[:200], Y_test[:200], yhat[:200])
 
 #--Gradient descent
-iterations = 1000
-gd = GradientDescent()
-beta,cost_rec,theta_rec, yhat, stopping = gd.GD(X, Y, beta = np.zeros(X.shape[1]).reshape(-1, 1), alpha = 0.1, iterations = iterations, early_stopping=True)
-gd.summary(Y, yhat)
-gd.plot_cost(cost_rec, stopping)
+iterations = 100
+gd = GradientDescent().GD(X_train, Y_train, beta = np.zeros(X.shape[1]), alpha = 0.1, iterations = iterations, early_stopping=False)
+yhat = gd.predict(X_test)
+gd.summary(Y_test, yhat)
 
 #--stochastic gradient descent
-stgrad = StochasticGradientDescent()
-beta,cost_rec, yhat, stopping = stgrad.StochGD(X, Y, beta = np.zeros(X.shape[1]).reshape(-1, 1), alpha = 0.8, iterations = iterations, early_stopping=True)
-stgrad.summary(Y, yhat)
-stgrad.plot_cost(cost_rec, stopping)
+stgrad = StochasticGradientDescent().StochGD(X_train, Y_train, beta = np.zeros(X.shape[1]), alpha = 0.8, iterations = iterations, early_stopping=True)
+yhat = stgrad.predict(X_test)
+stgrad.summary(Y_test, yhat)
 
 #--minibatch gradient descent
-minibatch = MinibatchGradientDescent()
-beta,cost_rec, yhat, stopping = minibatch.minbatchGD(X, Y, beta = np.zeros(X.shape[1]).reshape(-1, 1), alpha = 0.01, iterations = iterations, batch_size = 20, early_stopping=True)
+minibatch = MinibatchGradientDescent().minbatchGD(X_train, Y_train, beta = np.zeros(X.shape[1]), alpha = 0.01, iterations = iterations, batch_size = 20, early_stopping=True)
+yhat = minibatch.predict(X_test)
 minibatch.summary(Y, yhat)
-minibatch.plot_cost(cost_rec, stopping)
 
 
 
