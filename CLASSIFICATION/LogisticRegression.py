@@ -131,9 +131,6 @@ class Logistic():
         '''
         return (2 * (self.precision(A, P) * self.recall(A, P)))/(self.precision(A, P) + self.recall(A, P))
     
-    def MSE(self, yh, y):
-        return np.square(yh - y).mean()
-    
     def summary(self, A, P):
         print('*'*40)
         print('\t\tSummary')
