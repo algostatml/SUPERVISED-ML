@@ -73,6 +73,8 @@ class Logistic():
         '''Docstring
         :params: A: Actual label
         :params: P: predicted labels
+        
+        Also: Accuracy np.mean(Y == model.predict(X))
         '''
         return (self.TP(A, P) + self.TN(A, P))/(self.TP(A, P) + self.FP(A, P) +\
                                                 self.FN(A, P) + self.TN(A, P))
@@ -177,6 +179,46 @@ class Logistic():
             print('%s iteratiion, cost = %s'%(ii, self.cost_rec[ii]))
         return self
     
+    def predict(self, X):
+        '''
+        param: X_test = NxD feature matrix
+        '''
+        y_pred = np.zeros(X.shape[0])
+        for ii in range(len(y_pred)):
+            if Logistic.sigmoid(X[ii], self.beta) > 0.5:
+                y_pred[ii] = 1
+        return y_pred
+
+class RegularizedLogit(Logistic):
+    def __init__(self, lamda):
+        super().__init__()
+        self.lamda = lamda
+        return
+    
+    def cost(self, X, Y, beta):
+        '''Docstring
+        :params: X: features N x (M+1)
+        :params: Y: label y \in {0,1} N x 1 dimension
+        :params: beta: weights N x 1
+        
+        '''
+        return -(1/len(Y)) * np.sum((Y*np.log(Logistic.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - Logistic.sigmoid(X, beta)))) + (self.lamda/(2*len(Y))*np.sum(beta))
+    
+    def fit(self, X, Y, alpha, iterations):
+        self.alpha = alpha
+        self.iterations = iterations
+        self.beta = np.zeros(X.shape[1])
+        self.cost_rec = np.zeros(self.iterations)
+        self.beta_rec = np.zeros((self.iterations, X.shape[1]))
+        for ii in range(self.iterations):
+            #compute gradient
+            self.beta = self.beta + (1/len(Y)) *(self.alpha) * (X.T.dot(Y - Logistic.sigmoid(X, self.beta)) + ((self.lamda/len(Y))*self.beta))
+            self.beta_rec[ii, :] = self.beta.T
+            self.cost_rec[ii] = self.cost(X, Y, self.beta)
+            print('*'*40)
+            print('%s iteratiion, cost = %s'%(ii, self.cost_rec[ii]))
+        return self
+        
     def predict(self, X):
         '''
         param: X_test = NxD feature matrix
