@@ -12,12 +12,18 @@ class Perceptron(object):
     def __init__(self, activation = False, norm = None, lamda = None, l1 = None):
         self.activation = activation
         self.norm = norm
+        self.lamda = lamda
         if self.norm == 'l2':
-            self.lamda = 0.001
+            if self.lamda is None:
+                self.lamda = 0.001
+            else:
+                self.lamda = lamda
         elif self.norm == 'l1':
-            self.lamda = 0.001
-        else:
-            self.lamda = lamda
+            if self.lamda is None:
+                self.lamda = 0.001
+            else:
+                self.lamda = lamda
+
         return
     
     @staticmethod
@@ -266,7 +272,7 @@ class Perceptron(object):
         
 #%%
 
-pctron = Perceptron(activation='relu', norm = 'l1').fit(X_train, Y_train.reshape(-1, 1), 0.1, 1000)
+pctron = Perceptron(activation='sigmoid', norm = 'l1').fit(X_train, Y_train.reshape(-1, 1), 0.1, 1000)
 pctron.predict(X_test)
 plt.plot(np.arange(pctron.iterations), pctron.cost_rec)
 
