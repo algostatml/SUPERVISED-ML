@@ -202,7 +202,8 @@ class RegularizedLogit(Logistic):
         :params: beta: weights N x 1
         
         '''
-        return -(1/len(Y)) * np.sum((Y*np.log(Logistic.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - Logistic.sigmoid(X, beta)))) + (self.lamda/(2*len(Y))*np.sum(beta))
+        return -(1/len(Y)) * (np.sum((Y*np.log(Logistic.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - Logistic.sigmoid(X, beta)))) +\
+                 ((self.lamda/2)*np.sum(np.square(beta))))
     
     def fit(self, X, Y, alpha, iterations):
         self.alpha = alpha
@@ -212,7 +213,8 @@ class RegularizedLogit(Logistic):
         self.beta_rec = np.zeros((self.iterations, X.shape[1]))
         for ii in range(self.iterations):
             #compute gradient
-            self.beta = self.beta + (1/len(Y)) *(self.alpha) * (X.T.dot(Y - Logistic.sigmoid(X, self.beta)) + ((self.lamda/len(Y))*self.beta))
+            self.beta = self.beta + (1/len(Y)) *(self.alpha) * (X.T.dot(Y - Logistic.sigmoid(X, self.beta)) +\
+                                                 ((self.lamda/len(Y))*self.beta))
             self.beta_rec[ii, :] = self.beta.T
             self.cost_rec[ii] = self.cost(X, Y, self.beta)
             print('*'*40)
@@ -254,7 +256,8 @@ class stochasticLogistic(Logistic):
         :params: beta: weights N x 1
         
         '''
-        return -(1/len(Y)) * np.sum((Y*np.log(stochasticLogistic.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - stochasticLogistic.sigmoid(X, beta))))
+        return -(1/len(Y)) * np.sum((Y*np.log(stochasticLogistic.sigmoid(X, beta))) +\
+                 ((1 - Y)*np.log(1 - stochasticLogistic.sigmoid(X, beta))))
     
     def fit(self, X, Y):
         self.beta = np.zeros(X.shape[1])
@@ -310,7 +313,8 @@ class minibatchLogistic(Logistic):
         :params: beta: weights N x 1
         
         '''
-        return -(1/len(Y)) * np.sum((Y*np.log(minibatchLogistic.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - minibatchLogistic.sigmoid(X, beta))))
+        return -(1/len(Y)) * np.sum((Y*np.log(minibatchLogistic.sigmoid(X, beta))) +\
+                 ((1 - Y)*np.log(1 - minibatchLogistic.sigmoid(X, beta))))
     
     def fit(self, X, Y, batchSize = None):
         self.beta = np.zeros(X.shape[1])
@@ -346,6 +350,7 @@ class minibatchLogistic(Logistic):
         return y_pred
     
 #%%
+import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.model_selection import train_test_split
 X, y = make_blobs(n_samples=100, centers=2, n_features=2 )
