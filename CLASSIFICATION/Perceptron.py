@@ -16,10 +16,6 @@ class Perceptron(object):
             self.lamda = 0.001
         elif self.norm == 'l1':
             self.lamda = 0.001
-#            if not self.l1:
-#                self.l1 = 10.0
-#            else:
-#                self.l1 = l1
         else:
             self.lamda = lamda
         return
