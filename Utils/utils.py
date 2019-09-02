@@ -154,26 +154,6 @@ class EvalR(object):
     def __init__(self):
         return
     
-    def fit(self, X, Y):
-        '''
-        :param: X: train data/matrix (N x D)
-        :param: Y: test target/variable (N x 1)
-        :return: weights(beta) parametrs
-        '''
-        self.X = X
-        self.Y = Y
-        #--Closed form
-        self.beta = np.linalg.solve(self.X.T.dot(self.X), self.X.T.dot(self.Y))
-        return self
-        
-    def predict(self, X):
-        '''
-        :param: X: test data (N x D)
-        :return: predicted continous/discrete target
-        '''
-        Y_hat = X.dot(self.beta)
-        return Y_hat
-    
     #-Root Mean Square Error
     def RMSE(self, yh, y):
         '''
