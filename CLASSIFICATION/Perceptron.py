@@ -9,7 +9,7 @@ import numpy as np
 
 
 class Perceptron(object):
-    def __init__(self, activation = False, norm = None, lamda = None, l1 = None):
+    def __init__(self, activation = False, norm = None, lamda = None):
         self.activation = activation
         self.norm = norm
         self.lamda = lamda
