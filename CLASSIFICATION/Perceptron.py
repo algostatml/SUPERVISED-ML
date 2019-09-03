@@ -44,7 +44,7 @@ class Perceptron(object):
         :params: X: traing data at ith iteration
         :return: 0 or max
         '''
-        return np.max(np.dot(X, beta), 0)
+        return np.maximum(np.dot(X, beta), 0)
     
     @staticmethod
     def tanh(X, beta):
@@ -335,7 +335,7 @@ class Perceptron(object):
         
 #%%
 
-pctron = Perceptron(activation='sigmoid', norm = 'ElasticNet').fit(X_train, Y_train.reshape(-1, 1), 0.1, 1000)
+pctron = Perceptron(activation='relu', norm = 'ElasticNet').fit(X_train, Y_train.reshape(-1, 1), 0.1, 1000)
 pctron.predict(X_test)
 plt.plot(np.arange(pctron.iterations), pctron.cost_rec)
 
