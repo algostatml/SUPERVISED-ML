@@ -23,7 +23,11 @@ class Perceptron(object):
                 self.lamda = 0.001
             else:
                 self.lamda = lamda
-
+        elif self.norm == 'ElasticNet':
+            if self.lamda is None:
+                self.lamda = 0.001
+            else:
+                self.lamda = lamda
         return
     
     @staticmethod
@@ -77,6 +81,13 @@ class Perceptron(object):
                 return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.relu(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.relu(X, beta)))) + ((self.lamda)*np.sum(beta)))
             elif self.activation == 'tanh':
                 return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.tanh(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.tanh(X, beta)))) + ((self.lamda)*np.sum(beta)))
+        elif self.norm == 'ElasticNet':
+            if not self.activation or self.activation == 'sigmoid':
+                return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.sigmoid(X, beta)))) + ((self.lamda/2)*np.sum(np.square(beta))) + ((self.lamda)*np.sum(beta)))
+            elif self.activation == 'relu':
+                return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.relu(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.relu(X, beta)))) + ((self.lamda/2)*np.sum(np.square(beta))) + ((self.lamda)*np.sum(beta)))
+            elif self.activation == 'tanh':
+                return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.tanh(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.tanh(X, beta)))) + ((self.lamda/2)*np.sum(np.square(beta))) + ((self.lamda)*np.sum(beta)))
             
     def fit(self, X, Y, alpha, iterations):
         self.alpha = alpha
@@ -188,7 +199,7 @@ class Perceptron(object):
                     print('%s iteratiion, cost = %s'%(ii, self.cost_rec[ii]))
                 return self
         #--l1
-        else:
+        elif self.norm == 'l1':
             if not self.activation or self.activation == 'sigmoid':
                 ylen = len(Y)
                 for ii in range(self.iterations):
@@ -240,6 +251,59 @@ class Perceptron(object):
                     print('*'*40)
                     print('%s iteratiion, cost = %s'%(ii, self.cost_rec[ii]))
                 return self
+        #--Elastic Net
+        else:
+            if not self.activation or self.activation == 'sigmoid':
+                ylen = len(Y)
+                for ii in range(self.iterations):
+                    #compute stochastic gradient
+                    sampledCost = 0
+                    for ij in range(ylen):
+                        random_samples = np.random.randint(1, ylen)
+                        X_samp = X[:random_samples]
+                        Y_samp = Y[:random_samples]
+                        self.beta = self.beta + (1/len(Y_samp)) *(self.alpha) * (X_samp.T.dot(Y_samp - Perceptron.sigmoid(X_samp, self.beta)) +\
+                                                 (self.lamda*np.sign(self.beta)) + ((self.lamda/len(Y))*self.beta))
+                        self.beta_rec[ii, :] = self.beta.T
+                        sampledCost += self.cost(X_samp, Y_samp, self.beta)
+                    self.cost_rec[ii] = sampledCost
+                    print('*'*40)
+                    print('%s iteratiion, cost = %s'%(ii, self.cost_rec[ii]))
+                return self
+            elif self.activation == 'relu':
+                ylen = len(Y)
+                for ii in range(self.iterations):
+                    #compute stochastic gradient
+                    sampledCost = 0
+                    for ij in range(ylen):
+                        random_samples = np.random.randint(1, ylen)
+                        X_samp = X[:random_samples]
+                        Y_samp = Y[:random_samples]
+                        self.beta = self.beta + (1/len(Y_samp)) *(self.alpha) * (X_samp.T.dot(Y_samp - Perceptron.relu(X_samp, self.beta)) +\
+                                                 (self.lamda*np.sign(self.beta)) + ((self.lamda/len(Y))*self.beta))
+                        self.beta_rec[ii, :] = self.beta.T
+                        sampledCost += self.cost(X_samp, Y_samp, self.beta)
+                    self.cost_rec[ii] = sampledCost
+                    print('*'*40)
+                    print('%s iteratiion, cost = %s'%(ii, self.cost_rec[ii]))
+                return self
+            elif self.activation == 'tanh':
+                ylen = len(Y)
+                for ii in range(self.iterations):
+                    #compute stochastic gradient
+                    sampledCost = 0
+                    for ij in range(ylen):
+                        random_samples = np.random.randint(1, ylen)
+                        X_samp = X[:random_samples]
+                        Y_samp = Y[:random_samples]
+                        self.beta = self.beta + (1/len(Y_samp)) *(self.alpha) * (X_samp.T.dot(Y_samp - Perceptron.tanh(X_samp, self.beta)) +\
+                                                 (self.lamda*np.sign(self.beta)) + ((self.lamda/len(Y))*self.beta))
+                        self.beta_rec[ii, :] = self.beta.T
+                        sampledCost += self.cost(X_samp, Y_samp, self.beta)
+                    self.cost_rec[ii] = sampledCost
+                    print('*'*40)
+                    print('%s iteratiion, cost = %s'%(ii, self.cost_rec[ii]))
+                return self
     
     def predict(self, X):
         '''
@@ -272,7 +336,7 @@ class Perceptron(object):
         
 #%%
 
-pctron = Perceptron(activation='sigmoid', norm = 'l1').fit(X_train, Y_train.reshape(-1, 1), 0.1, 1000)
+pctron = Perceptron(activation='sigmoid', norm = 'ElasticNet').fit(X_train, Y_train.reshape(-1, 1), 0.1, 1000)
 pctron.predict(X_test)
 plt.plot(np.arange(pctron.iterations), pctron.cost_rec)
 
