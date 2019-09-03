@@ -318,7 +318,6 @@ class Perceptron(object):
                     y_pred[ii] = 0
             return y_pred
         elif self.activation == 'relu':
-            print('relu')
             for ii in range(len(y_pred)):
                 if Perceptron.sigmoid(X[ii], self.beta) >= 0:
                     y_pred[ii] = 1
