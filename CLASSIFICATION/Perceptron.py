@@ -319,16 +319,16 @@ class Perceptron(object):
             return y_pred
         elif self.activation == 'relu':
             for ii in range(len(y_pred)):
-                if Perceptron.sigmoid(X[ii], self.beta) >= 0:
+                if Perceptron.relu(X[ii], self.beta) >= 0:
                     y_pred[ii] = 1
-                elif Perceptron.sigmoid(X[ii], self.beta) < 0:
+                elif Perceptron.relu(X[ii], self.beta) < 0:
                     y_pred[ii] = 0
             return y_pred
         elif self.activation == 'tanh':
             for ii in range(len(y_pred)):
-                if Perceptron.sigmoid(X[ii], self.beta) > 0:
+                if Perceptron.tanh(X[ii], self.beta) > 0:
                     y_pred[ii] = 1
-                elif Perceptron.sigmoid(X[ii], self.beta) < 0:
+                elif Perceptron.tanh(X[ii], self.beta) < 0:
                     y_pred[ii]
             return  y_pred
         
