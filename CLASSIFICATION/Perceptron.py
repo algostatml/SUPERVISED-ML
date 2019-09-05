@@ -64,30 +64,44 @@ class Perceptron(object):
             if not self.activation or self.activation == 'sigmoid':
                 return -(1/len(Y)) * np.sum((Y*np.log(Perceptron.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.sigmoid(X, beta))))
             elif self.activation == 'relu':
-                return -(1/len(Y)) * np.sum((Y*np.log(Perceptron.relu(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.relu(X, beta))))
+                return -(1/len(Y)) * (np.sum((Y*np.where(np.log(Perceptron.relu(X, beta)) == 1, 0.99, np.log(Perceptron.relu(X, beta)))) + \
+                               ((1 - Y)*np.log(1 - np.where(np.log(Perceptron.relu(X, beta)) == 1, 0.99, np.log(Perceptron.relu(X, beta)))))))
             elif self.activation == 'tanh':
-                return -(1/len(Y)) * np.sum((Y*np.log(Perceptron.tanh(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.tanh(X, beta))))
+                return -(1/len(Y)) * (np.sum((Y*np.where(np.log(Perceptron.tanh(X, beta)) == 1, 0.99, np.log(Perceptron.tanh(X, beta)))) + \
+                               ((1 - Y)*np.log(1 - np.where(np.log(Perceptron.relu(X, beta)) == 1, 0.99, np.log(Perceptron.tanh(X, beta)))))))
         elif self.norm == 'l2':
             if not self.activation or self.activation == 'sigmoid':
                 return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.sigmoid(X, beta)))) + ((self.lamda/2)*np.sum(np.square(beta))))
             elif self.activation == 'relu':
-                return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.relu(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.relu(X, beta)))) + ((self.lamda/2)*np.sum(np.square(beta))))
+                return -(1/len(Y)) * (np.sum((Y*np.where(np.log(Perceptron.relu(X, beta)) == 1, 0.99, np.log(Perceptron.relu(X, beta)))) + \
+                               ((1 - Y)*np.log(1 - np.where(np.log(Perceptron.relu(X, beta)) == 1, 0.99, np.log(Perceptron.relu(X, beta)))))) + \
+                                ((self.lamda/2)*np.sum(np.square(beta))))
             elif self.activation == 'tanh':
-                return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.tanh(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.tanh(X, beta)))) + ((self.lamda/2)*np.sum(np.square(beta))))
+                return -(1/len(Y)) * (np.sum((Y*np.where(np.log(Perceptron.tanh(X, beta)) == 1, 0.99, np.log(Perceptron.tanh(X, beta)))) + \
+                               ((1 - Y)*np.log(1 - np.where(np.log(Perceptron.relu(X, beta)) == 1, 0.99, np.log(Perceptron.tanh(X, beta)))))) + \
+                                ((self.lamda/2)*np.sum(np.square(beta))))
         elif self.norm == 'l1':
             if not self.activation or self.activation == 'sigmoid':
                 return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.sigmoid(X, beta)))) + ((self.lamda)*np.sum(beta)))
             elif self.activation == 'relu':
-                return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.relu(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.relu(X, beta)))) + ((self.lamda)*np.sum(beta)))
+                return -(1/len(Y)) * (np.sum((Y*np.where(np.log(Perceptron.relu(X, beta)) == 1, 0.99, np.log(Perceptron.relu(X, beta)))) + \
+                               ((1 - Y)*np.log(1 - np.where(np.log(Perceptron.relu(X, beta)) == 1, 0.99, np.log(Perceptron.relu(X, beta)))))) + \
+                                ((self.lamda)*np.sum(beta)))
             elif self.activation == 'tanh':
-                return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.tanh(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.tanh(X, beta)))) + ((self.lamda)*np.sum(beta)))
+                return -(1/len(Y)) * (np.sum((Y*np.where(np.log(Perceptron.tanh(X, beta)) == 1, 0.99, np.log(Perceptron.tanh(X, beta)))) + \
+                               ((1 - Y)*np.log(1 - np.where(np.log(Perceptron.relu(X, beta)) == 1, 0.99, np.log(Perceptron.tanh(X, beta)))))) + \
+                                ((self.lamda)*np.sum(beta)))
         elif self.norm == 'ElasticNet':
             if not self.activation or self.activation == 'sigmoid':
                 return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.sigmoid(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.sigmoid(X, beta)))) + ((self.lamda/2)*np.sum(np.square(beta))) + ((self.lamda)*np.sum(beta)))
             elif self.activation == 'relu':
-                return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.relu(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.relu(X, beta)))) + ((self.lamda/2)*np.sum(np.square(beta))) + ((self.lamda)*np.sum(beta)))
+                return -(1/len(Y)) * (np.sum((Y*np.where(np.log(Perceptron.relu(X, beta)) == 1, 0.99, np.log(Perceptron.relu(X, beta)))) + \
+                               ((1 - Y)*np.log(1 - np.where(np.log(Perceptron.relu(X, beta)) == 1, 0.99, np.log(Perceptron.relu(X, beta)))))) + \
+                                ((self.lamda/2)*np.sum(np.square(beta))) + ((self.lamda)*np.sum(beta)))
             elif self.activation == 'tanh':
-                return -(1/len(Y)) * (np.sum((Y*np.log(Perceptron.tanh(X, beta))) + ((1 - Y)*np.log(1 - Perceptron.tanh(X, beta)))) + ((self.lamda/2)*np.sum(np.square(beta))) + ((self.lamda)*np.sum(beta)))
+                return -(1/len(Y)) * (np.sum((Y*np.where(np.log(Perceptron.tanh(X, beta)) == 1, 0.99, np.log(Perceptron.tanh(X, beta)))) + \
+                               ((1 - Y)*np.log(1 - np.where(np.log(Perceptron.relu(X, beta)) == 1, 0.99, np.log(Perceptron.tanh(X, beta)))))) + \
+                                ((self.lamda/2)*np.sum(np.square(beta))) + ((self.lamda)*np.sum(beta)))
             
     def fit(self, X, Y, alpha, iterations):
         self.alpha = alpha
@@ -335,7 +349,7 @@ class Perceptron(object):
         
 #%%
 
-pctron = Perceptron(activation='relu', norm = 'ElasticNet').fit(X_train, Y_train.reshape(-1, 1), 0.1, 1000)
+pctron = Perceptron(activation='relu', norm = 'l2').fit(X_train, Y_train.reshape(-1, 1), 0.1, 100)
 pctron.predict(X_test)
 plt.plot(np.arange(pctron.iterations), pctron.cost_rec)
 
