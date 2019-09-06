@@ -348,7 +348,10 @@ class Perceptron(object):
         
         
 #%%
-
+import matplotlib.pyplot as plt
+#--nonregularized
+pctron = Perceptron().fit(X_train, Y_train.reshape(-1, 1), 0.1, 100)
+#--regularized
 pctron = Perceptron(activation='relu', norm = 'l2').fit(X_train, Y_train.reshape(-1, 1), 0.1, 100)
 pctron.predict(X_test)
 plt.plot(np.arange(pctron.iterations), pctron.cost_rec)
