@@ -7,13 +7,7 @@ Created on Sat Sep  7 21:27:59 2019
 """
 import numpy as np
 
-'''
-Note that it is not advisable to
-use relu or tanh for perceptron learning.
-This is because they particularly fit for
-Non-linearly seperable problems and may overfit for 
-linearly seperable problems. 
-'''
+
 class Perceptron(object):
     def __init__(self):
         return
