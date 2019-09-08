@@ -357,6 +357,7 @@ X, y = make_blobs(n_samples=100, centers=2, n_features=2 )
 X = np.c_[np.ones(X.shape[0]), X]
 X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3)
 logit = Logistic().fit(X_train, Y_train, 0.1, 100)
+plt.scatter(X_train[:, 1], X_train[:, 2], c = logit.predict(X_train))
 y_pred = logit.predict(X_test)
 logit.summary(Y_test, y_pred)
 logit.confusionMatrix(Y_test, y_pred)
