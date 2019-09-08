@@ -7,6 +7,13 @@ Created on Sat Sep  7 21:27:59 2019
 """
 import numpy as np
 
+'''
+Note that it is not advisable to
+use relu or tanh for perceptron learning.
+This is because they particularly fit for
+Non-linearly seperable problems and may overfit for 
+linearly seperable problems. 
+'''
 class Perceptron(object):
     def __init__(self):
         return
@@ -29,6 +36,23 @@ class Perceptron(object):
         return 1/(1  + np.exp(-(np.dot(X, beta))))
     
     @staticmethod
+    def relu(X, beta):
+        '''
+        :params: X: traing data at ith iteration
+        :return: 0 or max
+        '''
+        return np.maximum(np.dot(X, beta), 0)
+    
+    @staticmethod
+    def tanh(X, beta):
+        '''
+        :params: X: traing data at ith iteration
+        :return: 0 or tanh(X, beta)
+        '''
+        return (np.exp(np.dot(X, beta)) - np.exp(-np.dot(X, beta)))/\
+                (np.exp(np.dot(X, beta)) + np.exp(-np.dot(X, beta)))
+                
+    @staticmethod
     def cost(y, ypred):
         '''
         :params: y: actual label
@@ -49,7 +73,7 @@ class Perceptron(object):
         self.pred = np.zeros(len(Y))
         for ii in range(self.iterations):
             for ij, (x_i, y_i) in enumerate(zip(X, Y)):
-                self.pred[ij] = Perceptron.activation(X[ij], self.beta)
+                self.pred[ij] = Perceptron.tanh(X[ij], self.beta)
                 if self.pred[ij] != y_i:
                     self.beta = self.beta + self.alpha * Perceptron.cost(y_i, self.pred[ij])*x_i
                 print(f'{self.beta}')
