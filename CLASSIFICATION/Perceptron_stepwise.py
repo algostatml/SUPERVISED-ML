@@ -80,12 +80,13 @@ class Perceptron(object):
         return self
     
     def predict(self, X):
+        '''
+        param: X_test = NxD feature matrix
+        '''
         y_pred = np.zeros(X.shape[0])
         for ii in range(X.shape[0]):
             if Perceptron.activation(X[ii], self.beta) == 1:
                 y_pred[ii] = 1
-            elif Perceptron.activation(X[ii], self.beta) == -1:
-                y_pred[ii] = 0
         return y_pred
     
     
