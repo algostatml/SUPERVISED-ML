@@ -67,4 +67,5 @@ class loss:
         return (np.exp(np.dot(X, beta)) - np.exp(-np.dot(X, beta)))/\
                 (np.exp(np.dot(X, beta)) + np.exp(-np.dot(X, beta)))
                 
-    
+                
+
