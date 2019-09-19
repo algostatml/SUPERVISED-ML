@@ -24,6 +24,17 @@ class loss:
         return 1/(1  + np.exp(-(np.dot(X, beta))))
     
     @staticmethod
+    def hinge(X, beta):
+        '''
+        Also known as the logistic loss,
+        especially because it is used 
+        for logistic regression
+        :params: X: traing data at ith iteration
+        :return: 0 or 1
+        '''
+        return np.maximum(1- np.dot(X, beta), 0)
+    
+    @staticmethod
     def relu(X, beta):
         '''
         :params: X: traing data at ith iteration
