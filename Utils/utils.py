@@ -93,6 +93,17 @@ class EvalC():
         '''
         return self.TP(A, P)/(self.TP(A, P) + self.FN(A, P))
     
+    def fscore(self, A, P, beta):
+        '''Docstring
+        :params: A: Actual label
+        :params: P: predicted labels
+        :params: beta: positive parameter for rebalancing evaluation task.
+        Reference: http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=3CB7C5A08700CAF45274C75AABFB75B2?doi=10.1.1.95.9153&rep=rep1&type=pdf
+        '''
+        return ((np.square(beta) + 1)*self.precision(A, P)*self.recall(A, P))/\
+                (np.square(beta) * self.precision(A, P) + self.recall(A, P))
+                
+                
     def TPR(self, A, P):
         '''Docstring
         True Positive rate:
