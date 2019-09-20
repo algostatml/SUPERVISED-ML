@@ -43,6 +43,14 @@ class loss:
         return np.maximum(np.dot(X, beta), 0)
     
     @staticmethod
+    def leakyrelu(X, beta):
+        '''
+        :params: X: traing data at ith iteration
+        :return: 0 or max
+        '''
+        return np.maximum(np.dot(X, beta), 0.1*np.dot(X, beta))
+    
+    @staticmethod
     def square(X, beta):
         '''
         :params: X: traing data at ith iteration
