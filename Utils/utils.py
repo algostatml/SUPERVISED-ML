@@ -157,6 +157,7 @@ class EvalC():
         print('>> Precision: %s'%self.precision(A, P))
         print('>> Recall: %s'%self.recall(A, P))
         print('>> F1-score: %s'%self.f1(A, P))
+        print('>> Improved F-score: %s'%self.fscore(A, P))
         print('>> True positive rate: %s'%self.TPR(A, P))
         print('>> False positive rate: %s'%self.FPR(A, P))
         print('*'*40)
