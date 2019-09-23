@@ -7,7 +7,7 @@ Created on Wed Aug 28 15:14:33 2019
 """
 import numpy as np
 
-class EvalC():
+class EvalC:
     def __init__(self):
         return
     
@@ -21,7 +21,8 @@ class EvalC():
     predicted   -ve |   FN    |   TN    | v
                     --------------------- Recall
     '''
-    def TP(self, A, P):
+    @staticmethod
+    def TP(A, P):
         '''Docstring
         when actual is 1 and prediction is 1
         
@@ -30,7 +31,8 @@ class EvalC():
         '''
         return np.sum((A == 1) & (P == 1))
     
-    def FP(self, A, P):
+    @staticmethod
+    def FP(A, P):
         '''Docstring
         when actual is 0 and prediction is 1
         
@@ -39,7 +41,8 @@ class EvalC():
         '''
         return np.sum((A == 0) & (P == 1))
     
-    def FN(self, A, P):
+    @staticmethod
+    def FN(A, P):
         '''Docstring
         when actual is 1 and prediction is 0
         
@@ -48,7 +51,8 @@ class EvalC():
         '''
         return np.sum((A == 1) & (P == 0))
     
-    def TN(self, A, P):
+    @staticmethod
+    def TN(A, P):
         '''Docstring
         when actual is 0 and prediction is 0
         
@@ -57,54 +61,59 @@ class EvalC():
         '''
         return np.sum((A == 0) & (P == 0))
     
-    def confusionMatrix(self, A, P):
+    @staticmethod
+    def confusionMatrix(A, P):
         '''Docstring
         
         :params: A: Actual label
         :params: P: predicted labels
         '''
-        TP, FP, FN, TN = (self.TP(A, P),\
-                          self.FP(A, P),\
-                          self.FN(A, P),\
-                          self.TN(A, P))
+        TP, FP, FN, TN = (EvalC.TP(A, P),\
+                          EvalC.FP(A, P),\
+                          EvalC.FN(A, P),\
+                          EvalC.TN(A, P))
         return np.array([[TP, FP], [FN, TN]])
     
-    def accuracy(self, A, P):
+    @staticmethod
+    def accuracy(A, P):
         '''Docstring
         :params: A: Actual label
         :params: P: predicted labels
         
         Also: Accuracy np.mean(Y == model.predict(X))
         '''
-        return (self.TP(A, P) + self.TN(A, P))/(self.TP(A, P) + self.FP(A, P) +\
-                                                self.FN(A, P) + self.TN(A, P))
+        return (EvalC.TP(A, P) + EvalC.TN(A, P))/(EvalC.TP(A, P) + EvalC.FP(A, P) +\
+                                                EvalC.FN(A, P) + EvalC.TN(A, P))
     
-    def precision(self, A, P):
+    @staticmethod
+    def precision(A, P):
         '''Docstring
         :params: A: Actual label
         :params: P: predicted labels
         '''
-        return self.TP(A, P)/(self.TP(A, P) + self.FP(A, P))
+        return EvalC.TP(A, P)/(EvalC.TP(A, P) + EvalC.FP(A, P))
     
-    def recall(self, A, P):
+    @staticmethod
+    def recall(A, P):
         '''Docstring
         :params: A: Actual label
         :params: P: predicted labels
         '''
-        return self.TP(A, P)/(self.TP(A, P) + self.FN(A, P))
+        return EvalC.TP(A, P)/(EvalC.TP(A, P) + EvalC.FN(A, P))
     
-    def fscore(self, A, P, beta):
+    @staticmethod
+    def fscore(A, P, beta):
         '''Docstring
         :params: A: Actual label
         :params: P: predicted labels
         :params: beta: positive parameter for rebalancing evaluation task.
         Reference: http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=3CB7C5A08700CAF45274C75AABFB75B2?doi=10.1.1.95.9153&rep=rep1&type=pdf
         '''
-        return ((np.square(beta) + 1)*self.precision(A, P)*self.recall(A, P))/\
-                (np.square(beta) * self.precision(A, P) + self.recall(A, P))
+        return ((np.square(beta) + 1)*EvalC.precision(A, P)*EvalC.recall(A, P))/\
+                (np.square(beta) * EvalC.precision(A, P) + EvalC.recall(A, P))
                 
-                
-    def TPR(self, A, P):
+    @staticmethod         
+    def TPR(A, P):
         '''Docstring
         True Positive rate:
             True Positive Rate corresponds to the 
@@ -115,9 +124,10 @@ class EvalC():
         :params: A: Actual label
         :params: P: predicted labels
         '''
-        return self.recall(A, P)
+        return EvalC.recall(A, P)
     
-    def FPR(self, A, P):
+    @staticmethod
+    def FPR(A, P):
         '''Docstring
         False Positive rate:
             False Positive Rate corresponds to the 
@@ -129,20 +139,22 @@ class EvalC():
         :params: A: Actual label
         :params: P: predicted labels
         '''
-        return self.FP(A, P)/(self.FP(A, P) + self.TN(A, P))
+        return EvalC.FP(A, P)/(EvalC.FP(A, P) + EvalC.TN(A, P))
     
-    def TNR(self, A, P):
+    @staticmethod
+    def TNR(A, P):
         '''Docstring
         True Negative Rate
         '''
-        return self.TN(A, P)/(self.TN(A, P) + self.FP(A, P))
-       
-    def f1(self, A, P):
+        return EvalC.TN(A, P)/(EvalC.TN(A, P) + EvalC.FP(A, P))
+    
+    @staticmethod
+    def f1(A, P):
         '''Docstring
         :params: A: Actual label
         :params: P: predicted labels
         '''
-        return (2 * (self.precision(A, P) * self.recall(A, P)))/(self.precision(A, P) + self.recall(A, P))
+        return (2 * (EvalC.precision(A, P) * EvalC.recall(A, P)))/(EvalC.precision(A, P) + EvalC.recall(A, P))
     
     def summary(self, A, P):
         '''
@@ -162,20 +174,13 @@ class EvalC():
         print('>> False positive rate: %s'%self.FPR(A, P))
         print('*'*40)
         
-class EvalR(object):
+class EvalR:
     def __init__(self):
         return
     
-    #-Root Mean Square Error
-    def RMSE(self, yh, y):
-        '''
-        :param: yh: predicted target
-        :param: y: actual target
-        :return: square root of mean square error
-        '''
-        return np.sqrt(self.MSE(yh, y))
     #-Mean Square Error
-    def MSE(self, yh, y):
+    @staticmethod
+    def MSE(yh, y):
         '''
         :param: yh: predicted target
         :param: y: actual target
@@ -183,8 +188,19 @@ class EvalR(object):
         '''
         return np.square(yh - y).mean()
     
+    #-Root Mean Square Error
+    @staticmethod
+    def RMSE(yh, y):
+        '''
+        :param: yh: predicted target
+        :param: y: actual target
+        :return: square root of mean square error
+        '''
+        return np.sqrt(EvalR.MSE(yh, y))
+    
     #-Mean Absolute Error
-    def MAE(self, yh, y):
+    @staticmethod
+    def MAE(yh, y):
         '''
         :param: yh: predicted target
         :param: y: actual target
@@ -193,7 +209,8 @@ class EvalR(object):
         return np.abs(yh - y).mean()
     
     #-Median Absolute Error
-    def MDAE(self, yh, y):
+    @staticmethod
+    def MDAE(yh, y):
         '''
         :param: yh: predicted target
         :param: y: actual target
@@ -202,7 +219,8 @@ class EvalR(object):
         return np.median(np.abs(yh - y))
     
     #-Mean Squared Log Error
-    def MSLE(self, yh, y):
+    @staticmethod
+    def MSLE(yh, y):
         '''
         :param: yh: predicted target
         :param: y: actual target
@@ -211,7 +229,8 @@ class EvalR(object):
         return np.mean(np.square((np.log(y + 1)-np.log(yh + 1))))
     
     #-R-squared Error
-    def R_squared(self, yh, y):
+    @staticmethod
+    def R_squared(yh, y):
         '''
         :param: yh: predicted target
         :param: y: actual target
@@ -221,7 +240,8 @@ class EvalR(object):
         return (1 -(np.sum(np.square(y - yh))/np.sum(np.square(y - y.mean()))))
     
     #--HUber loss
-    def Huber(self, yh, y, delta=None):
+    @staticmethod
+    def Huber(yh, y, delta=None):
         '''
         :param: yh: predicted target
         :param: y: actual target
@@ -237,7 +257,8 @@ class EvalR(object):
         return np.array(loss).mean()
     
     #--Explained Variance score
-    def explainedVariance(self, yh, y):
+    @staticmethod
+    def explainedVariance(yh, y):
         '''
         :param: yh: predicted target
         :param: y: actual target
