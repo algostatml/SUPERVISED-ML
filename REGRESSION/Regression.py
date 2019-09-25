@@ -133,7 +133,7 @@ class GradientDescent(Regression):
         if early_stopping:
             for self.iter in range(iterations):
                 #compute gradient
-                self.beta = beta - (1/len(Y_train)) *(alpha) * (np.dot(X_train.T, (np.dot(X_train, beta) - Y_train)))
+                self.beta = beta - (1/len(Y)) *(alpha) * (np.dot(X.T, (np.dot(X, beta) - Y)))
                 self.beta_rec[self.iter, :] = self.beta.T
                 self.cost_rec[self.iter] = self.cost(X, Y, self.beta)
                 print('*'*40)
@@ -457,7 +457,7 @@ class MinibatchGradientDescent(Regression):
                         break
                     else:
                         continue
-                self.cost_rec[self.iter] = cost_val #np.average(cost_val)
+                self.cost_rec[self.iter] = np.average(cost_val)
                 print('*'*40)
                 print('%s iteratiion, cost = %s'%(self.iter, self.cost_rec[self.iter]))    
                 #--compare last and previous value. stop if they are the same
@@ -633,7 +633,7 @@ stgrad.summary(Y_test, yhat)
 #--minibatch gradient descent
 minibatch = MinibatchGradientDescent().minbatchGD(X_train, Y_train, beta = np.zeros(X.shape[1]), alpha = 0.01, iterations = iterations, batch_size = 20, early_stopping=True)
 yhat = minibatch.predict(X_test)
-minibatch.summary(Y, yhat)
+minibatch.summary(Y_test, yhat)
 
 
 
