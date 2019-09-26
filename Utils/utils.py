@@ -107,6 +107,7 @@ class EvalC:
         :params: A: Actual label
         :params: P: predicted labels
         :params: beta: positive parameter for rebalancing evaluation task.
+        
         Reference: http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=3CB7C5A08700CAF45274C75AABFB75B2?doi=10.1.1.95.9153&rep=rep1&type=pdf
         '''
         return ((np.square(beta) + 1)*EvalC.precision(A, P)*EvalC.recall(A, P))/\
