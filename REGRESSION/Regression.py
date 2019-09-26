@@ -617,21 +617,21 @@ Y = df_standard_no_out[['Price']].values
 lm = Regression().fit(X_train, Y_train)
 yhat = lm.predict(X_test)
 lm.summary(Y_test, yhat)
-gd.plot(X_test[:200], Y_test[:200], yhat[:200])
+lm.plot(X_test[:200], Y_test[:200], yhat[:200])
 
 #--Gradient descent
-iterations = 100
-gd = GradientDescent().GD(X_train, Y_train, beta = np.zeros(X.shape[1]), alpha = 0.1, iterations = iterations, early_stopping=False)
+iterations = 50000
+gd = GradientDescent().GD(X_train, Y_train, beta = np.zeros(X.shape[1]), alpha = 2.1, iterations = iterations, early_stopping=False)
 yhat = gd.predict(X_test)
 gd.summary(Y_test, yhat)
 
 #--stochastic gradient descent
-stgrad = StochasticGradientDescent().StochGD(X_train, Y_train, beta = np.zeros(X.shape[1]), alpha = 0.8, iterations = iterations, early_stopping=True)
+stgrad = StochasticGradientDescent().StochGD(X_train, Y_train, beta = np.zeros(X.shape[1]), alpha = 2.1, iterations = iterations, early_stopping=True)
 yhat = stgrad.predict(X_test)
 stgrad.summary(Y_test, yhat)
 
 #--minibatch gradient descent
-minibatch = MinibatchGradientDescent().minbatchGD(X_train, Y_train, beta = np.zeros(X.shape[1]), alpha = 0.01, iterations = iterations, batch_size = 20, early_stopping=True)
+minibatch = MinibatchGradientDescent().minbatchGD(X_train, Y_train, beta = np.zeros(X.shape[1]), alpha = 2.1, iterations = iterations, batch_size = 20, early_stopping=True)
 yhat = minibatch.predict(X_test)
 minibatch.summary(Y_test, yhat)
 
