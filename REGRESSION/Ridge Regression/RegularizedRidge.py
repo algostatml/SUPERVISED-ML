@@ -112,4 +112,8 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = .3)
 ridge = Ridge().fit(X_train, Y_train)
 ridge.summary(Y_test, ridge.predict(X_test))
 
+#%% visualize coefficients in no particular order
+import matplotlib.pyplot as plt
+import pandas as pd
+pd.Series(ridge.beta).plot(kind = 'bar')   
         
