@@ -240,6 +240,19 @@ class EvalR:
         #-- R_square = 1 - (SS[reg]/SS[total])
         return (1 -(np.sum(np.square(y - yh))/np.sum(np.square(y - y.mean()))))
     
+    @staticmethod
+    def Adjusted_Rquared(X, yh, y):
+        '''
+        :param: yh: predicted target
+        :param: y: actual target
+        :return: Adjusted R-squared error = 1 - [(1 - R^2)(N-1)]/(N- p -1)
+                R^2: R-squared 
+                N: Total samples
+                p: Number of predictors
+        '''
+        N, p = X.shape
+        return 1 - (((1 - EvalR.R_squared(yh, y))*(N - 1))/(N - p - 1))
+    
     #--HUber loss
     @staticmethod
     def Huber(yh, y, delta=None):
@@ -268,7 +281,7 @@ class EvalR:
         e = y - yh
         return (1 - ((np.sum(np.square(e - np.mean(e))))/(np.sum(np.square(y - y.mean())))))
     
-    def summary(self, y, y_hat):
+    def summary(self, X, y, y_hat):
         '''
         :param: y_hat: predicted target
         :param: y: actual target
@@ -286,6 +299,8 @@ class EvalR:
         print('MDAE: %s'%(EvalR.MDAE(y_hat,  y)))
         print('*'*40)
         print('R_squared = %s'%(EvalR.R_squared(y_hat,  y)))
+        print('*'*40)
+        print('Adjusted R_squared = %s'%(EvalR.Adjusted_Rquared(X, y_hat,  y)))
         print('*'*40)
         print('Huber = %s'%(EvalR.Huber(y_hat,  y)))
         print('*'*40)
