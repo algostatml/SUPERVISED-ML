@@ -98,3 +98,18 @@ class RidgeGD(EvalR):
         plt.xlabel('Iteration')
         plt.ylabel('Cost')
         plt.show()
+        
+        
+#%% Testing
+    
+from sklearn.datasets import load_boston
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import Normalizer
+
+X, y = load_boston().data, load_boston().target
+X = Normalizer().fit_transform(X)
+X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = .3)
+ridge = Ridge().fit(X_train, Y_train)
+ridge.summary(Y_test, ridge.predict(X_test))
+
+        
