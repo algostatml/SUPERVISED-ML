@@ -2,7 +2,7 @@
 Supervised machine learning algorithms explained with code
 
 ----------------------
-##### $ \textcolor{red}{Logistic Regression} $ | [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/CLASSIFICATION/LogisticRegression.py)
+##### Logistic Regression | [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/CLASSIFICATION/LogisticRegression.py)
 
 ##### Here we present the solution to logistic regression using the cross-entropy loss function. This is a binary classifier for supervised learning and we solve the optimization function derived from the maximum likelihood using gradient ascent.
 ----------------------
