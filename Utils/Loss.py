@@ -38,7 +38,7 @@ class loss:
     def relu(X, beta):
         '''
         :params: X: traing data at ith iteration
-        :return: 0 or max
+        :return: max, 0
         '''
         return np.maximum(np.dot(X, beta), 0)
     
@@ -46,7 +46,7 @@ class loss:
     def leakyrelu(X, beta):
         '''
         :params: X: traing data at ith iteration
-        :return: 0 or max
+        :return: max, 0.1z
         '''
         return np.maximum(np.dot(X, beta), 0.1*np.dot(X, beta))
     
@@ -54,7 +54,7 @@ class loss:
     def square(X, beta):
         '''
         :params: X: traing data at ith iteration
-        :return: 0 or max
+        :return: square loss
         '''
         return .5(np.dot(X, beta) + 1)
     
@@ -62,7 +62,7 @@ class loss:
     def exponential(X, beta):
         '''
         :params: X: traing data at ith iteration
-        :return: 0 or max
+        :return: exponential
         '''
         return np.exp(2*np.dot(X, beta))/(1 + 2*np.dot(X, beta))
     
