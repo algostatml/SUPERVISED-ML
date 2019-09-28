@@ -1,6 +1,6 @@
 # Regularized regression
 
-Closed form solution and optimization solution to solving the Ridge and lasso regression.
+Closed form solution and optimized solution to solving the Ridge and lasso regression.
 
 ----------------------
 ##### Ridge (L2) Regression | [code](https://github.com/algostatml/SUPERVISED-ML/tree/master/REGRESSION/Ridge%20Regression)
