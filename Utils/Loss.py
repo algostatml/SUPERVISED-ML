@@ -75,5 +75,13 @@ class loss:
         return (np.exp(np.dot(X, beta)) - np.exp(-np.dot(X, beta)))/\
                 (np.exp(np.dot(X, beta)) + np.exp(-np.dot(X, beta)))
                 
+    @staticmethod
+    def softplus(X, beta):
+        '''
+        :params: X: traing data at ith iteration
+        :return: log(1 + e^x)
+                NOTE that log1p is the reverse of exp(x) - 1
+        '''
+        return np.log1p(np.dot(X, beta))
                 
 
