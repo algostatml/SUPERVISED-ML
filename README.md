@@ -8,13 +8,13 @@ Supervised machine learning algorithms explained with code
 ----------------------
 ##### Perceptron | Cross-Entropy [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/CLASSIFICATION/Perceptron.py) | 
 
-##### Single layer perceptron is the basics upon which Artificial Neural Networks (ANN) are built. We solved the optimization problem of the single layer perceptron using the 'Perceptron Convergence algorithm'
+##### Single layer perceptron is the basics upon which Artificial Neural Networks (ANN) are built. We solved the optimization problem of the single layer perceptron using the 'Perceptron Convergence algorithm'.
 ----------------------
 ##### Perceptron | Convergence algo [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/CLASSIFICATION/Perceptron_stepwise.py)
-----------------------
 
- ##### The loss function here is solved using the 'Stochastic gradient descent' algorihm. Noe that 'Perceptron Convergence algorrithm' is also a variant of the stochastic gradient descent algorithm except it uses the stepwise activation function.
- 
+##### The loss function here is solved using the 'Stochastic gradient descent' algorihm. Noe that 'Perceptron Convergence algorrithm' is also a variant of the stochastic gradient descent algorithm except it uses the stepwise activation function.
+----------------------
 ##### Linear Regression | Gradient descent | Stochastic GD | Ridge | [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/REGRESSION/Regression.py)
 
 ##### Linear regression is a foremost statistical model for predictive learning. Here we solved the regression problem by deriving its closed form solution. Since, the closed form solution is computationally expensive especially in solving the matrix inverse with $O(N^{3})$, researchers developed a stochastic gradient descent algorithm for regression. 
+----------------------
