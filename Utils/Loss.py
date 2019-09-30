@@ -24,15 +24,14 @@ class loss:
         return 1/(1  + np.exp(-(np.dot(X, beta))))
     
     @staticmethod
-    def hinge(X, beta):
+    def hinge(X, y, beta):
         '''
-        Also known as the logistic loss,
-        especially because it is used 
-        for logistic regression
+        Hinge loss function
+        is used for Support vector machines (SVM)
         :params: X: traing data at ith iteration
-        :return: 0 or 1
+        :return: 0 or max margin
         '''
-        return np.maximum(1- np.dot(X, beta), 0)
+        return np.maximum(1 - y*np.dot(X, beta), 0)
     
     @staticmethod
     def relu(X, beta):
