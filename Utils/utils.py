@@ -157,7 +157,7 @@ class EvalC:
         '''
         return (2 * (EvalC.precision(A, P) * EvalC.recall(A, P)))/(EvalC.precision(A, P) + EvalC.recall(A, P))
     
-    def summary(self, A, P):
+    def summary(self, A, P, beta):
         '''
         :params: A: Actual label
         :params: P: predicted labels
@@ -170,7 +170,7 @@ class EvalC:
         print('>> Precision: %s'%EvalC.precision(A, P))
         print('>> Recall: %s'%EvalC.recall(A, P))
         print('>> F1-score: %s'%EvalC.f1(A, P))
-        print('>> Improved F-score: %s'%EvalC.fscore(A, P))
+        print('>> Improved F-score: %s'%EvalC.fscore(A, P, beta))
         print('>> True positive rate: %s'%EvalC.TPR(A, P))
         print('>> False positive rate: %s'%EvalC.FPR(A, P))
         print('*'*40)
