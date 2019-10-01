@@ -74,7 +74,7 @@ class linearSVM(loss):
     
             
 #%%
-
+import matplotlib.pyplot as plt
 lsvm = linearSVM().fit(X_train, Y_train)
 lsvm.predict(X_test)
 plt.scatter(X_test[:, 0], X_test[:, 1], c = lsvm.predict(X_test))
