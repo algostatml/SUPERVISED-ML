@@ -130,7 +130,7 @@ class StochasticlinearSVM(loss):
                 y_samp = y[:random_samples]
                 self.margin = self.margins(X_samp, y_samp, self.beta)
                 #adjust parameters according to misclafication
-                indices = np.where(self.margin < 0)
+                indices = np.where(self.margin < 1)
                 self.beta = self.beta - self.alpha*(self.beta - self.C * y_samp[indices].dot(X_samp[indices]))
                 self.beta_rec[ii, :] = self.beta.T
                 self.cost_rec[ii] += self.cost(X, y, self.beta)
