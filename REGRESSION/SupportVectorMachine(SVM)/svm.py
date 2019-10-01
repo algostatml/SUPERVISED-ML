@@ -17,7 +17,7 @@ class linearSVM(loss):
         '''
         Linear SVM via Gradient descent
         :params: C: misclassification penalty. 
-                    Default value is 0.1.
+                    Default value is 1.0.
         '''
         if not C:
             C = 1.0
