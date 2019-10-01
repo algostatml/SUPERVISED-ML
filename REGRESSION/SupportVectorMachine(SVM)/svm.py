@@ -146,6 +146,11 @@ class StochasticlinearSVM(loss):
               
 #%%
 import matplotlib.pyplot as plt
+from sklearn.datasets import make_blobs
+from sklearn.model_selection import train_test_split
+X, y = make_blobs(n_samples=100, centers=2, n_features=2)
+X = np.c_[np.ones(X.shape[0]), X]
+X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3)
 lsvm = linearSVM().fit(X_train, Y_train)
 lsvm.predict(X_test)
 plt.scatter(X_test[:, 0], X_test[:, 1], c = lsvm.predict(X_test))
