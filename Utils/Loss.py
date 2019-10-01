@@ -31,7 +31,7 @@ class loss:
         :params: X: traing data at ith iteration
         :return: 0 or max margin
         '''
-        return np.maximum(1 - y*np.dot(X, beta), 0)
+        return np.maximum(0, 1 - y*(np.dot(X, beta)))
     
     @staticmethod
     def relu(X, beta):
