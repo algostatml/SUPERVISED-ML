@@ -14,8 +14,9 @@ class Kernels:
     '''Docstring
     Kernels are mostly used for solving
     non-lineaar problems. By projecting/transforming
-    our data into a subspace that promote classification
-    performance.
+    our data into a subspace, making it easy to
+    almost accurately classify our data as if it were
+    still in linear space.
     '''
     def __init__(self):
         return
