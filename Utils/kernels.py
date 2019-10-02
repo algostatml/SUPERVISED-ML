@@ -14,8 +14,9 @@ class Kernels:
     '''Docstring
     Kernels are mostly used for solving
     non-lineaar problems. By projecting/transforming
-    our data into a subspace that promote classification
-    performance.
+    our data into a subspace, making it easy to
+    almost accurately classify our data as if it were
+    still in linear space.
     '''
     def __init__(self):
         return
@@ -64,18 +65,4 @@ class Kernels:
             gamma = .05
         if not C:
             C = 1
-        return np.tanh(gamma * x1.T.dot(x2) + C)
-    
-    @staticmethod
-    def polynomial(x1, x2, d = None):
-        '''
-        RBF: Radial basis function or guassian kernel
-        ----------------------------------------------
-        :param: x1: NxD transposed feature space
-        :param: x2: NxD feature space
-        :param: d: polynomial degree
-        :return type: kernel(Gram) matrix
-        '''
-        if not d:
-            d = 2
-        return (x1.T.dot(x2))**d
+        return np.tanh(gamma * x1.T.dot(x2))
