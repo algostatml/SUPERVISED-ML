@@ -30,7 +30,7 @@ class Kernels:
         :param: x2: NxD feature space
         :return type: kernel(Gram) matrix
         '''
-        return x1.T.dot(x2)
+        return x1.dot(x2.T)
     
     @staticmethod
     def rbf(x1, x2, gamma = None):
@@ -65,7 +65,7 @@ class Kernels:
             gamma = .05
         if not C:
             C = 1
-        return np.tanh(gamma * x1.T.dot(x2))
+        return np.tanh(gamma * x1.dot(x2.T))
     
     @staticmethod
     def polynomial(x1, x2, d = None):
