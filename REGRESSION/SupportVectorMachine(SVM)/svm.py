@@ -55,7 +55,7 @@ class linearSVM(loss):
             self.iterations = iterations
         else:
             self.iterations = iterations
-        self.beta = np.random.randn(X.shape[1])
+        self.beta = np.zeros(X.shape[1])
         self.cost_rec = np.zeros(self.iterations)
         self.beta_rec = np.zeros((self.iterations, X.shape[1]))
         for ii in range(self.iterations):
@@ -65,7 +65,7 @@ class linearSVM(loss):
             self.beta = self.beta - self.alpha*(self.beta - self.C * y[indices].dot(X[indices]))
             self.beta_rec[ii, :] = self.beta.T
             self.cost_rec[ii] = self.cost(X, y, self.beta)
-            print(f"cost is {self.cost(X, y, self.beta)}")
+            print(f"cost is {self.cost(X, y, self.beta)}, Gradient: {self.beta - self.C * y[indices].dot(X[indices])}")
         return self
     
     def predict(self, X):
@@ -119,7 +119,7 @@ class StochasticlinearSVM(loss):
             self.iterations = iterations
         else:
             self.iterations = iterations
-        self.beta = np.random.randn(X.shape[1])
+        self.beta = np.zeros(X.shape[1])
         self.cost_rec = np.zeros(self.iterations)
         self.beta_rec = np.zeros((self.iterations, X.shape[1]))
         ylen = len(y)
@@ -162,3 +162,5 @@ slsvm.predict(X_test)
 plt.scatter(X_test[:, 0], X_test[:, 1], c = slsvm.predict(X_test))
 np.mean(slsvm.predict(X_test) == Y_test)
 plt.plot(np.arange(slsvm.iterations), slsvm.cost_rec)
+
+
