@@ -66,3 +66,18 @@ class Kernels:
         if not C:
             C = 1
         return np.tanh(gamma * x1.T.dot(x2))
+    
+    @staticmethod
+    def polynomial(x1, x2, d = None):
+        '''
+        polynomial kernel
+        ----------------------------------------------
+        :param: x1: NxD transposed feature space
+        :param: x2: NxD feature space
+        :param: d: polynomial degree
+        :return type: kernel(Gram) matrix
+        '''
+        if not d:
+            d = 2
+        return (x1.T.dot(x2))**d
+    
