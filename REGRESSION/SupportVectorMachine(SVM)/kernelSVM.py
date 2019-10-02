@@ -14,6 +14,9 @@ from Utils.kernels import Kernels
 class kSVM(EvalR, loss, Kernels):
     '''
     Kernelized SVM via Gradient ascent.
+    -----------------------------------
+    Dual Lagrangian formulation
+    for kernel SVMs.
     '''
     def __init__(self, kernel = None, C = None):
         self.kernel = kernel
