@@ -81,3 +81,31 @@ class Kernels:
             d = 2
         return (x1.T.dot(x2))**d
     
+    @staticmethod
+    def cosine(x1, x2):
+        '''
+        Cosine kernel
+        ----------------------------------------------
+        :param: x1: NxD transposed feature space
+        :param: x2: NxD feature space
+        :return type: kernel(Gram) matrix
+        '''
+        
+        return (x1.T.dot(x2)/np.linalg.norm(x1, 1) * np.linalg.norm(x2, 1))
+    
+    @staticmethod
+    def correlation(x1, x2, gamma = None):
+        '''
+        Correlation kernel
+        ----------------------------------------------
+        :param: x1: NxD transposed feature space
+        :param: x2: NxD feature space
+        :param: gamma: 1/2(sigma-square)
+        :return type: kernel(Gram) matrix
+        '''
+        if not gamma:
+            gamma = 1.0/x1.shape[1]
+        return np.exp((x1.T.dot(x2)/np.linalg.norm(x1, 1) * np.linalg.norm(x2, 1)) - gamma)
+    
+    
+    
