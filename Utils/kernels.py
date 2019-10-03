@@ -49,7 +49,7 @@ class Kernels:
         elif (x1.ndim > 1 and x2.ndim == 1) or (x1.ndim == 1 and x2.ndim > 1):
             return np.exp(-gamma * np.linalg.norm(x1 - x2, axis = 1)**2)
         elif x1.ndim > 1 and x2.ndim > 1:
-            return np.exp(-gamma * np.linalg.norm(x1[:, np.newaxis] - x2[np.newaxis, :], axis = 1)**2)
+            return np.exp(-gamma * np.linalg.norm(x1[:, np.newaxis] - x2[np.newaxis, :], axis = 2)**2)
         
     @staticmethod
     def sigmoid(x1, x2, gamma = None, C = None):
@@ -91,7 +91,7 @@ class Kernels:
         :return type: kernel(Gram) matrix
         '''
         
-        return (x1.T.dot(x2)/np.linalg.norm(x1, 1) * np.linalg.norm(x2, 1))
+        return (x1.dot(x2.T)/np.linalg.norm(x1, 1) * np.linalg.norm(x2, 1))
     
     @staticmethod
     def correlation(x1, x2, gamma = None):
@@ -105,7 +105,7 @@ class Kernels:
         '''
         if not gamma:
             gamma = 1.0/x1.shape[1]
-        return np.exp((x1.T.dot(x2)/np.linalg.norm(x1, 1) * np.linalg.norm(x2, 1)) - gamma)
+        return np.exp((x1.dot(x2.T)/np.linalg.norm(x1, 1) * np.linalg.norm(x2, 1)) - gamma)
     
     
     
