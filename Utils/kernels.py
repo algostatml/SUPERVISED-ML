@@ -79,7 +79,7 @@ class Kernels:
         '''
         if not d:
             d = 2
-        return (x1.T.dot(x2))**d
+        return (x1.dot(x2.T))**d
     
     @staticmethod
     def cosine(x1, x2):
