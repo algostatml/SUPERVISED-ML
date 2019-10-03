@@ -19,9 +19,15 @@ class kSVM(EvalR, loss, Kernels):
     for kernel SVMs.
     '''
     def __init__(self, kernel = None, C = None):
-        self.kernel = kernel
+        if not kernel:
+            kernel = 'rbf' #default
+            self.kernel = kernel
+        else:
+            self.kernel = kernel
         if not C:
             C = 1.0
+            self.C = C
+        else:
             self.C = C
         return
     
@@ -31,6 +37,24 @@ class kSVM(EvalR, loss, Kernels):
         '''
         return np.outer(y, y)
        
+    def kernellize(self, X):
+        '''
+        :params: X: NxD
+        '''
+        if self.kernel == 'linear':
+            return Kernels.linear(X, X)
+        elif self.kernel == 'rbf':
+            return Kernels.rbf(X, X)
+        elif self.kernel == 'sigmoid':
+            return Kernels.sigmoid(X, X)
+        elif self.kernel == 'polynomial':
+            return Kernels.polynomial(X, X)
+        elif self.kernel == 'cosine':
+            return Kernels.cosine(X, X)
+        elif self.kernel == 'correlation':
+            return Kernels.correlation(X, X)
+        
+        
     def alpha_y_i_kernel(self, X, y):
         '''
         :params: X:
@@ -39,7 +63,7 @@ class kSVM(EvalR, loss, Kernels):
         alpha = np.zeros(X.shape[0])
         self.alph_s = np.outer(alpha, alpha) #alpha_i alpha_j
         self.y_i_s = self.y_i(y) #y_i y_j
-        self.kernel = Kernels.rbf(X, X) #Using the RBF kernel to get Gram matrix
+        self.kernel = self.kernellize(X) #Using the RBF kernel to get Gram matrix
         return (alpha, self.alph_s, self.y_i_s, self.kernel)
         
     def cost(self):
@@ -60,8 +84,12 @@ class kSVM(EvalR, loss, Kernels):
         if not lr:
             lr = 1e-5
             self.lr = lr
+        else:
+            self.lr = lr
         if not iterations:
             iterations = 500
+            self.iteration = iterations
+        else:
             self.iteration = iterations
         self.alpha, self.alpha_i_s, self.y_i_s,  self.kernel = self.alpha_y_i_kernel(X, y)
         cost = np.zeros(iterations)
@@ -92,7 +120,7 @@ from sklearn.model_selection import train_test_split
 X, y = make_blobs(n_samples=100, centers=2, n_features=2)
 X = np.c_[np.ones(X.shape[0]), X]
 X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3)
-kernelsvm = kSVM().fit(X_train, Y_train)
+kernelsvm = kSVM(kernel='sigmoid').fit(X_train, Y_train)
 kernelsvm.predict(X_test)
 np.mean(kernelsvm.predict(X_test) == Y_test)
 plt.scatter(X_test[:, 0], X_test[:, 1], c = kernelsvm.predict(X_test))          
