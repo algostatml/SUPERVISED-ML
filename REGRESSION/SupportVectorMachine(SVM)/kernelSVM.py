@@ -39,7 +39,7 @@ class kSVM(EvalR, loss, Kernels):
         alpha = np.zeros(X.shape[0])
         self.alph_s = np.outer(alpha, alpha) #alpha_i alpha_j
         self.y_i_s = self.y_i(y) #y_i y_j
-        self.kernel = Kernels.linear(X, X) #Using the RBF kernel to get Gram matrix
+        self.kernel = Kernels.rbf(X, X) #Using the RBF kernel to get Gram matrix
         return (alpha, self.alph_s, self.y_i_s, self.kernel)
         
     def cost(self):
@@ -77,7 +77,7 @@ class kSVM(EvalR, loss, Kernels):
         return self
     
     def predict(self, X):
-        yhat:int = np.sign(np.dot(self.alpha * self.Y, Kernels.linear(self.X, X)))
+        yhat:int = np.sign(np.dot(self.alpha * self.Y, Kernels.rbf(self.X, X)))
         for enum, ii in enumerate(yhat):
             if ii <0:
                 yhat[enum] = 0
