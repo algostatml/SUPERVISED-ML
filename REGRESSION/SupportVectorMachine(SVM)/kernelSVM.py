@@ -46,10 +46,9 @@ class kSVM(EvalR, loss, Kernels):
         '''
         return type: x E R
         '''
-        
-        return np.sum(self.alpha) - .5 * np.sum(self.alpha_i_s * self.kernel * self.y_i_s )
+        return np.dot(self.alpha, np.ones(self.X.shape[0])) - .5 * np.sum(self.alpha_i_s * self.kernel * self.y_i_s )
     
-    def fit(self, X, y, lr = None, iterations = None):
+    def fit(self, X, y, lr:float = None, iterations:int = None):
         '''
         :params: X: NxD feature matrix
         :params: y: Dx1 target vector
