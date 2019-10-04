@@ -16,7 +16,7 @@ class linearSVM(loss):
     def __init__(self, C = None):
         '''
         Linear SVM via Gradient descent
-        :params: C: misclassification penalty. 
+        :params: C: misclassification penalty or regularizer. 
                     Default value is 1.0.
         '''
         if not C:
@@ -29,7 +29,7 @@ class linearSVM(loss):
     def cost(self, X, y, beta):
         '''
         Hinge loss function
-        ------------------
+        --------------------
         :params: X: feature space
         :params: y: target
         :params: beta: weights parameters.
