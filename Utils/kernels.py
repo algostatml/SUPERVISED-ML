@@ -43,13 +43,13 @@ class Kernels:
         :return type: kernel(Gram) matrix
         '''
         if not gamma:
-            gamma = 1.0/x1.shape[1]
+            gamma = 1/x1.shape[1]
         if x1.ndim == 1 and x2.ndim == 1:
             return np.exp(-gamma * np.linalg.norm(x1 - x2)**2)
         elif (x1.ndim > 1 and x2.ndim == 1) or (x1.ndim == 1 and x2.ndim > 1):
             return np.exp(-gamma * np.linalg.norm(x1 - x2, axis = 1)**2)
         elif x1.ndim > 1 and x2.ndim > 1:
-            return np.exp(-gamma * np.linalg.norm(x1[:, np.newaxis] - x2[np.newaxis, :], axis = 2)**2)
+            return np.exp(-gamma * np.linalg.norm(x1[:, None] - x2[None, :], axis = 2)**2)
         
     @staticmethod
     def sigmoid(x1, x2, gamma = None, C = None):
