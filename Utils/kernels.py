@@ -22,7 +22,7 @@ class Kernels:
         return
     
     @staticmethod
-    def linear(x1, x2):
+    def linear(x1, x2, c = None):
         '''
         Linear kernel
         ----------------------------
@@ -30,7 +30,9 @@ class Kernels:
         :param: x2: NxD feature space
         :return type: kernel(Gram) matrix
         '''
-        return x1.dot(x2.T)
+        if not c:
+            c = 0
+        return x1.dot(x2.T) + c
     
     @staticmethod
     def rbf(x1, x2, gamma = None):
@@ -43,16 +45,16 @@ class Kernels:
         :return type: kernel(Gram) matrix
         '''
         if not gamma:
-            gamma = 1/x1.shape[1]
+            gamma = 10 #we are using a big see for the make_moon dataset
         if x1.ndim == 1 and x2.ndim == 1:
             return np.exp(-gamma * np.linalg.norm(x1 - x2)**2)
         elif (x1.ndim > 1 and x2.ndim == 1) or (x1.ndim == 1 and x2.ndim > 1):
             return np.exp(-gamma * np.linalg.norm(x1 - x2, axis = 1)**2)
         elif x1.ndim > 1 and x2.ndim > 1:
-            return np.exp(-gamma * np.linalg.norm(x1[:, None] - x2[None, :], axis = 2)**2)
+            return np.exp(-gamma * np.linalg.norm(x1[:, np.newaxis] - x2[np.newaxis, :], axis = 2)**2)
         
     @staticmethod
-    def sigmoid(x1, x2, gamma = None, C = None):
+    def sigmoid(x1, x2, gamma = None, c = None):
         '''
         logistic or sigmoid kernel
         ----------------------------------------------
@@ -62,10 +64,10 @@ class Kernels:
         :return type: kernel(Gram) matrix
         '''
         if not gamma:
-            gamma = .05
-        if not C:
-            C = 1
-        return np.tanh(gamma * x1.dot(x2.T))
+            gamma = 10
+        if not c:
+            c = 1
+        return np.tanh(gamma * x1.dot(x2.T) + c)
     
     @staticmethod
     def polynomial(x1, x2, d = None):
@@ -104,7 +106,7 @@ class Kernels:
         :return type: kernel(Gram) matrix
         '''
         if not gamma:
-            gamma = 1.0/x1.shape[1]
+            gamma = 10
         return np.exp((x1.dot(x2.T)/np.linalg.norm(x1, 1) * np.linalg.norm(x2, 1)) - gamma)
     
     
