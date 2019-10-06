@@ -45,7 +45,7 @@ class Kernels:
         :return type: kernel(Gram) matrix
         '''
         if not gamma:
-            gamma = 10 #we are using a big see for the make_moon dataset
+            gamma = 10 #we are using a large gamma for the make_moon dataset
         if x1.ndim == 1 and x2.ndim == 1:
             return np.exp(-gamma * np.linalg.norm(x1 - x2)**2)
         elif (x1.ndim > 1 and x2.ndim == 1) or (x1.ndim == 1 and x2.ndim > 1):
