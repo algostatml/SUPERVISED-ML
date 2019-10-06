@@ -55,7 +55,7 @@ class loss:
         :params: X: traing data at ith iteration
         :return: square loss
         '''
-        return .5(np.dot(X, beta) + 1)
+        return .5*(np.dot(X, beta) + 1)
     
     @staticmethod
     def exponential(X, beta):
