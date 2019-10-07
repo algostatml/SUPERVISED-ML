@@ -248,7 +248,7 @@ kernelsvm.summary(Y_test, kernelsvm.predict(X_test), kernelsvm.alpha)
 plt.scatter(X_test[:, 0], X_test[:, 1], c = kernelsvm.predict(X_test))          
 
 
-primalkernelsvm = kprimalSVM(kernel='linear').fit(X_train, Y_train)
+primalkernelsvm = kprimalSVM(kernel='rbf').fit(X_train, Y_train)
 primalkernelsvm.predict(X_test)
 primalkernelsvm.summary(Y_test, primalkernelsvm.predict(X_test), primalkernelsvm.alpha)
 plt.scatter(X_test[:, 0], X_test[:, 1], c = primalkernelsvm.predict(X_test))          
