@@ -209,7 +209,7 @@ class kprimalSVM(EvalC, loss, Kernels):
         else:
             self.iteration = iterations
         self.alpha, self.alpha_i_s, self.y_i_s,  self.knl = self.alpha_y_i_kernel(X, y)
-        cost = np.zeros(iterations)
+        cost = np.zeros(self.iteration)
         self.cost_rec = np.zeros(self.iteration)
         for ii in  range(self.iteration):
             self.margin = self.Y * (self.alpha.dot(self.kernelize(self.X, self.X)) + self.b)
