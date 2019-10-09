@@ -14,7 +14,7 @@ from Utils.kernels import Kernels
 class kDualSVM(EvalC, loss, Kernels):
     '''
     Kernelized SVM via Gradient ascent.
-    -----------------------------------
+    ------------------------------------
     Dual Lagrangian formulation
     for kernel SVMs.
     '''
@@ -89,7 +89,7 @@ class kDualSVM(EvalC, loss, Kernels):
         else:
             self.lr = lr
         if not iterations:
-            iterations = 20
+            iterations = 3
             self.iteration = iterations
         else:
             self.iteration = iterations
@@ -118,7 +118,6 @@ class kDualSVM(EvalC, loss, Kernels):
                 yhat[enum] = 0
         return yhat
             
-#%%
         
 class kprimalSVM(EvalC, loss, Kernels):
     '''
@@ -204,7 +203,7 @@ class kprimalSVM(EvalC, loss, Kernels):
         else:
             self.lr = lr
         if not iterations:
-            iterations = 20
+            iterations = 10
             self.iteration = iterations
         else:
             self.iteration = iterations
