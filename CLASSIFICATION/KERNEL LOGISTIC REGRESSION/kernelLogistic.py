@@ -15,6 +15,8 @@ from Utils.kernels import Kernels
 class KLR(EvalC, loss, Kernels):
     def __init__(self, kernel = None, lamda = None):
         '''
+        Kernel Logistic Regression via Gradient Descent. [Solution 1]
+        ---------------------------------------------------------------------
         :param: kernel: kernel for computing Gram matrix
         :param: lamda: regularization parameter
         Reference: http://dept.stat.lsa.umich.edu/~jizhu/pubs/Zhu-JCGS05.pdf
@@ -75,7 +77,9 @@ class KLR(EvalC, loss, Kernels):
     def cost(self):
         '''
         return: cost
+         loss as seen in paper 1/len(self.Y)*np.ones(self.X.shape[0]).T.dot(1 + np.exp(-self.knl.dot(self.Y)))
         '''
+        
 #        return 1/len(self.Y)*np.ones(self.X.shape[0]).T.dot(1 + np.exp(-self.knl.dot(self.Y)))
         return self.Y.T.dot(np.dot(self.knl, self.alpha)) - np.sum(np.log(1 + np.exp(np.dot(self.knl, self.alpha)))) -\
                 .5*self.lamda*np.dot(self.alpha.T, np.dot(self.knl, self.alpha))
@@ -94,7 +98,7 @@ class KLR(EvalC, loss, Kernels):
         else:
             self.lr = lr
         if not iterations:
-            iterations = 100
+            iterations = 3
             self.iterations = iterations
         else:
             self.iterations = iterations
@@ -110,13 +114,16 @@ class KLR(EvalC, loss, Kernels):
         return self
     
     def predict(self, X):
-        y_pred = np.array((1/(1 + np.exp(-np.dot(self.Y * self.alpha, self.kernelize(self.X, X))))))
+        y_pred = np.array(np.sign(1/(1 + np.exp(-np.dot(self.Y * self.alpha, self.kernelize(self.X, X))))))
         for enum, ii in enumerate(y_pred):
             if y_pred[enum] > 0:
                 y_pred[enum] = 0
             else:
                 y_pred[enum] = 1
         return y_pred
+    
+
+    
     
 #%% Test
 import matplotlib.pyplot as plt
