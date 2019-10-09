@@ -80,7 +80,7 @@ class Kernels:
         :return type: kernel(Gram) matrix
         '''
         if not d:
-            d = 2
+            d = 3
         return (x1.dot(x2.T))**d
     
     @staticmethod
