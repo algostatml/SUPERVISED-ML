@@ -110,7 +110,6 @@ class KLR(EvalC, loss, Kernels):
             #compute the gradient
             self.alpha = self.alpha - (self.knl.dot(self.Y)*(np.ones(self.X.shape[0]) - self.activation()) + self.lamda * np.dot(self.knl, self.alpha))
 #            self.alpha = self.alpha - self.knl.dot(self.Y - self.activation() - self.lamda*self.alpha)
-        
         return self
     
     def predict(self, X):
@@ -129,7 +128,7 @@ class KLR(EvalC, loss, Kernels):
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs, make_moons
 from sklearn.model_selection import train_test_split
-X, y = make_moons(1000)
+X, y = make_moons(1000, noise = .3)
 X, y = make_blobs(n_samples=1000, centers=2, n_features=2)
 X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3)
 klrmodel = KLR(kernel='rbf').fit(X_train, Y_train)
