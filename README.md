@@ -15,6 +15,12 @@ Supervised machine learning algorithms explained with code
 ##### Logistic Regression | [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/CLASSIFICATION/LogisticRegression.py)
 
 ##### Here we present the solution to logistic regression using the cross-entropy loss function. This is a binary classifier for supervised classification problem and we solve the optimization function derived from the maximum likelihood using gradient ascent.
+
+----------------------
+##### Kernel Logistic Regression | [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/CLASSIFICATION/KERNEL%20LOGISTIC%20REGRESSION/kernelLogistic.py)
+
+##### Logistic regression is a linear binary classifier as implemented here. We therefore extend this version for handle non-linear datatypes by kernelizing. The implementation method here uses Gradient Descent and Iterative Reweighted Least Square (IRLS) for Kernelizing logistic regression.
+
 ----------------------
 ##### Perceptron | Cross-Entropy [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/CLASSIFICATION/Perceptron.py) | 
 
