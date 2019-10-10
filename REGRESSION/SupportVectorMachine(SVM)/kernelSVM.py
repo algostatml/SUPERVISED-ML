@@ -257,7 +257,7 @@ plt.plot(np.arange(primalkernelsvm.iteration), primalkernelsvm.cost_rec)
 #%% Testing SVC from sklearn
 
 from sklearn.svm import SVC
-svc = SVC(C = 1.0, kernel = 'rbf',gamma='auto')
+svc = SVC(C = 1.0, kernel = 'poly',gamma='auto')
 svc.fit(X_train, Y_train)
 plt.scatter(X_test[:, 0], X_test[:, 1], c = svc.predict(X_test))
 
