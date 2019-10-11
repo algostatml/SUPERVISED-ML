@@ -22,11 +22,11 @@ Supervised machine learning algorithms explained with code
 ##### Logistic regression is a linear binary classifier as implemented here. We therefore extend this version to handle non-linear datatypes by kernelizing it. The implementation method here uses Gradient Descent and Iterative Reweighted Least Square (IRLS) for Kernelizing logistic regression.
 
 ----------------------
-##### Perceptron | Cross-Entropy [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/CLASSIFICATION/Perceptron.py) | 
+##### Perceptron | Cross-Entropy | [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/CLASSIFICATION/Perceptron.py) 
 
 ##### Single layer perceptron is the foundation upon which Artificial Neural Networks (ANN) is built. We solved the optimization problem of the single layer perceptron using the 'Perceptron Convergence algorithm'.
 ----------------------
-##### Perceptron | Convergence algo [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/CLASSIFICATION/Perceptron_stepwise.py)
+##### Perceptron | Convergence algo | [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/CLASSIFICATION/Perceptron_stepwise.py)
 
 ##### The loss function here is solved using the 'Stochastic gradient descent' algorihm. Note that 'Perceptron Convergence algorrithm' is also a variant of the stochastic gradient descent algorithm except it uses the stepwise activation function.
 ----------------------
