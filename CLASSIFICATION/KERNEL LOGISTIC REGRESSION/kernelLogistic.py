@@ -98,7 +98,7 @@ class KLR(EvalC, loss, Kernels):
         else:
             self.lr = lr
         if not iterations:
-            iterations = 3
+            iterations = 2
             self.iterations = iterations
         else:
             self.iterations = iterations
