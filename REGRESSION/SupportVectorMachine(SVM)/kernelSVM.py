@@ -203,7 +203,7 @@ class kprimalSVM(EvalC, loss, Kernels):
         else:
             self.lr = lr
         if not iterations:
-            iterations = 10
+            iterations = 3
             self.iteration = iterations
         else:
             self.iteration = iterations
