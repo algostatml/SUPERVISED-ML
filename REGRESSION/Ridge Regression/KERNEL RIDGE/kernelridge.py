@@ -16,12 +16,12 @@ class kernelridge(EvalR, loss, Kernels):
     def __init__(self, kernel = None, lamda = None):
         super().__init__()
         if not kernel:
-            kernel = 'rbf'
+            kernel = 'linear'
             self.kernel = kernel
         else:
             self.kernel = kernel
         if not lamda:
-            lamda = 10000
+            lamda = 100000
             self.lamda = lamda
         else:
             self.lamda = lamda
@@ -52,8 +52,7 @@ class kernelridge(EvalR, loss, Kernels):
         '''
         self.X = X
         self.y = y
-        self.alpha = np.linalg.solve(self.kernelize(self.X, self.X) + self.lamda*self.X.shape[0]*np.eye(self.X.shape[0]), self.y)
-#        self.alpha = np.dot(self.y, np.linalg.inv(self.kernelize(self.X, self.X) + self.lamda*np.eye(self.X.shape[0])))
+        self.alpha = np.linalg.solve(self.kernelize(self.X, self.X) + self.lamda*np.eye(self.X.shape[0]), self.y)
         return self
     
     def predict(self, X):
@@ -77,4 +76,9 @@ kridge = kernelridge().fit(X_train, Y_train)
 kridge.predict(X_test)
 kridge.summary(X, Y_test, kridge.predict(X_test))
     
-    
+#%%
+
+from sklearn.kernel_ridge import KernelRidge
+clf = KernelRidge(alpha=1.0, kernel='linear')    
+clf.fit(X, y)
+kridge.summary(X, Y_test, clf.predict(X_test))
