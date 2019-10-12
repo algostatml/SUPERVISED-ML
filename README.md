@@ -11,6 +11,7 @@ Supervised machine learning algorithms explained with code
 
 ##### Ridge regression is best known for its ability to reduce the complexity of a model using the L2-norm (or euclidean norm). This happens by shricking the coefficients of the model towards zero. It turns out Ridge regression works well for dense dataset and learns a bad hypothesis for non-sparse problem.
 
+----------------------
 ##### Kernel Ridge Regression | [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/REGRESSION/Ridge%20Regression/KERNEL%20RIDGE/kernelridge.py)
 
 ##### Kernel regression is a machine learning preceduce for projecting 2-Dimension sapce into N-Dimensional space. We achieve this by satisfying the Mercer's Theory of inner products. Kernel ridge regression project the low dimensional feature space to higher dimension space by using the concept of support vector (representer theorem).
