@@ -21,7 +21,7 @@ class kernelridge(EvalR, loss, Kernels):
         else:
             self.kernel = kernel
         if not lamda:
-            lamda = 100
+            lamda = 10000
             self.lamda = lamda
         else:
             self.lamda = lamda
@@ -52,7 +52,8 @@ class kernelridge(EvalR, loss, Kernels):
         '''
         self.X = X
         self.y = y
-        self.alpha = np.linalg.solve(self.lamda*np.eye(self.X.shape[0]) + self.kernelize(self.X, self.X), self.y.T)
+        self.alpha = np.linalg.solve(self.kernelize(self.X, self.X) + self.lamda*self.X.shape[0]*np.eye(self.X.shape[0]), self.y)
+#        self.alpha = np.dot(self.y, np.linalg.inv(self.kernelize(self.X, self.X) + self.lamda*np.eye(self.X.shape[0])))
         return self
     
     def predict(self, X):
@@ -60,20 +61,20 @@ class kernelridge(EvalR, loss, Kernels):
         :param: X: NxD
         :return type: Dx1 vector
         '''
-        return np.dot(self.alpha, np.dot(self.y.T, self.kernelize(self.X, X)))
+        return np.dot((self.kernelize(self.X, X).T * self.y), self.alpha.T)
     
     
 #%% Testing
 
 from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import Normalizer
+from sklearn.preprocessing import Normalizer, StandardScaler
 
 X, y = load_boston().data, load_boston().target
-X = Normalizer().fit_transform(X)
+X = StandardScaler().fit_transform(X)
 X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = .3)
 kridge = kernelridge().fit(X_train, Y_train)
 kridge.predict(X_test)
-    
+kridge.summary(X, Y_test, kridge.predict(X_test))
     
     
