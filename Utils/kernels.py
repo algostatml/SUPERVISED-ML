@@ -11,7 +11,7 @@ import numpy as np
 
 
 class Kernels:
-    '''Docstring
+    '''
     Kernels are mostly used for solving
     non-lineaar problems. By projecting/transforming
     our data into a subspace, making it easy to
@@ -165,7 +165,7 @@ class Kernels:
         else:
             d = d
         if not op:
-            op = 'divide'
+            op = 'multiply'
         else:
             op = op
         if op == 'multiply':
@@ -192,7 +192,7 @@ class Kernels:
         else:
             gamma = gamma
         if not op:
-            op = 'divide'
+            op = 'subtract'
         else:
             op = op
         if op == 'multiply':
@@ -203,5 +203,7 @@ class Kernels:
             return Kernels.cosine(x1, x2) / Kernels.rbf(x1, x2, gamma)
         elif op == 'subtract':
             return np.abs(Kernels.cosine(x1, x2) - Kernels.rbf(x1, x2, gamma))
+        
+        
         
         
