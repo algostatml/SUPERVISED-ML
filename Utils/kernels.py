@@ -165,18 +165,43 @@ class Kernels:
         else:
             d = d
         if not op:
-            op = 'subtract'
+            op = 'divide'
         else:
             op = op
         if op == 'multiply':
-            return Kernels.polynomial(x1, x2) * Kernels.rbf(x1, x2, gamma)
+            return Kernels.polynomial(x1, x2, d) * Kernels.rbf(x1, x2, gamma)
         elif op == 'add':
-            return Kernels.polynomial(x1, x2) + Kernels.rbf(x1, x2, gamma)
+            return Kernels.polynomial(x1, x2, d) + Kernels.rbf(x1, x2, gamma)
         elif op == 'divide':
-            return Kernels.polynomial(x1, x2) / Kernels.rbf(x1, x2, gamma)
+            return Kernels.polynomial(x1, x2, d) / Kernels.rbf(x1, x2, gamma)
         elif op == 'subtract':
-            return np.abs(Kernels.polynomial(x1, x2) - Kernels.rbf(x1, x2, gamma))
+            return np.abs(Kernels.polynomial(x1, x2, d) - Kernels.rbf(x1, x2, gamma))
         
-        
+    @staticmethod
+    def rbfcosine(x1, x2, gamma = None, op = None):
+        '''
+        MKL: RBF + Polynomial kernel
+        ----------------------------------------------
+        :param: x1: NxD transposed feature space
+        :param: x2: NxD feature space
+        :param: gamma: 1/2(sigma-square)
+        :return type: kernel(Gram) matrix
+        '''
+        if not gamma:
+            gamma = 1/x1.shape[1]
+        else:
+            gamma = gamma
+        if not op:
+            op = 'divide'
+        else:
+            op = op
+        if op == 'multiply':
+            return Kernels.cosine(x1, x2) * Kernels.rbf(x1, x2, gamma)
+        elif op == 'add':
+            return Kernels.cosine(x1, x2) + Kernels.rbf(x1, x2, gamma)
+        elif op == 'divide':
+            return Kernels.cosine(x1, x2) / Kernels.rbf(x1, x2, gamma)
+        elif op == 'subtract':
+            return np.abs(Kernels.cosine(x1, x2) - Kernels.rbf(x1, x2, gamma))
         
         
