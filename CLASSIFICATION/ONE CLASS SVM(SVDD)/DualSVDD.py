@@ -21,7 +21,7 @@ class DualSVDD(EvalC, loss, Kernels):
         else:
             self.kernel = kernel
         if not C:
-            C = 1.0
+            C = 0.1
             self.C = C
         else:
             self.C = C
@@ -56,7 +56,7 @@ class DualSVDD(EvalC, loss, Kernels):
         :Return type: cost
         '''
 #        return np.sum(self.alpha_i_s * self.knl * self.y_i_s ) - np.sum(np.dot(self.Y, self.knl))
-        return self.alpha.dot(np.dot(self.alpha, self.knl)) -  np.sum(self.alpha*self.knl.diagonal())
+        return np.sum(self.alpha*self.knl.diagonal()) - self.alpha.dot(np.dot(self.alpha, self.knl))
 #    
     def alpha_y_i_kernel(self, X, y):
         '''
@@ -84,7 +84,7 @@ class DualSVDD(EvalC, loss, Kernels):
         else:
             self.lr = lr
         if not iterations:
-            iterations = 1
+            iterations = 10
             self.iterations = iterations
         else:
             self.iterations = iterations
@@ -93,23 +93,42 @@ class DualSVDD(EvalC, loss, Kernels):
         for ii in range(self.iterations):
             self.cost_rec[ii] = self.cost()
             print(f'Cost of computation: {self.cost_rec[ii]}')
-            self.alpha = self.alpha + self.lr * (np.dot(self.knl, self.alpha) - self.knl.diagonal())
-
-        indices = np.where((self.alpha > 0) & (self.alpha < self.C))
-        self.support_vectors = indices
+            self.alpha = self.alpha + self.lr * ( self.knl.diagonal() - np.dot(self.knl, self.alpha))
+#            self.alpha = self.alpha + self.lr * (np.dot(self.y_i_s * self.knl, self.alpha)) - np.dot(self.knl, self.Y)
+            self.alpha[self.alpha < 0] = 0
+            self.alpha[self.alpha > self.C] = self.C
+        self.indices = np.where((self.alpha > 0) & (self.alpha < self.C))
+        self.R = self.kernelize(self.X, self.X[self.indices]) - 2*np.dot(self.alpha, self.kernelize(self.X, self.X[self.indices]))+ self.alpha.dot(np.dot(self.alpha, self.kernelize(self.X, self.X[self.indices])))
+        self.support_vectors = self.indices
         print(f'Total support vectors required for classification: {len(self.support_vectors)}')
         return self
     
-
+    def predict(self, X):
+#        self.rho = self.kernelize(self.X, X) - 2*self.alpha.dot()
+        yhat:int = np.sign(np.dot(self.alpha, self.kernelize(self.X, X)))
+        return yhat
     
 #%% Testing
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs, make_moons, make_circles
 from sklearn.model_selection import train_test_split
-X, y = make_circles(1000, noise = .07, factor = .5)
+X, y = make_circles(1000, noise = .07, factor = .3)
+X = np.hstack((X, y.reshape(-1, 1)))
+df = X[X[:, 2] == 1][:, [0, 1]]
+dy = X[X[:, 2] == 1][:, 2]
+plt.scatter(df[:, 0], df[:, 1])
 plt.scatter(X[:, 0], X[:, 1])
 X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3)
-dsvdd = DualSVDD().fit(X_train, Y_train)
-dsvdd.predict(X_test)
+dsvdd = DualSVDD().fit(df, dy)
+plt.plot(np.arange(10), dsvdd.cost_rec)
+dsvdd.predict(X[:, [0, 1]])
 dsvdd.summary(Y_test, dsvdd.predict(X_test), dsvdd.alpha)  
 plt.scatter(X_test[:, 0], X_test[:, 1], c = dsvdd.predict(X_test))   
+
+
+#%%
+
+from sklearn import svm
+
+sv = svm.OneClassSVM(kernel = 'rbf')
+plt.scatter(X_test[:, 0], X_test[:, 1], c = sv.fit_predict(X_test)) 
