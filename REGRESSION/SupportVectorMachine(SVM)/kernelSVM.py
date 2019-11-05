@@ -55,6 +55,22 @@ class kDualSVM(EvalC, loss, Kernels):
             return Kernels.cosine(x1, x2)
         elif self.kernel == 'correlation':
             return Kernels.correlation(x1, x2)
+        elif self.kernel == 'linrbf':
+            return Kernels.linrbf(x1, x2)
+        elif self.kernel == 'rbfpoly':
+            return Kernels.rbfpoly(x1, x2)
+        elif self.kernel == 'rbfcosine':
+            return Kernels.rbfpoly(x1, x2)
+        elif self.kernel == 'etakernel':
+            return Kernels.etakernel(x1, x2)
+        elif self.kernel == 'alignment':
+            return Kernels.alignment(x1, x2)
+        elif self.kernel == 'laplace':
+            return Kernels.laplacian(x1, x2)
+        elif self.kernel == 'locguass':
+            return Kernels.locguass(x1, x2)
+        elif self.kernel == 'chi':
+            return Kernels.chi(x1)
         
         
     def alpha_y_i_kernel(self, X, y):
@@ -104,10 +120,10 @@ class kDualSVM(EvalC, loss, Kernels):
             #0 < alpha < C
             self.alpha[self.alpha < 0] = 0
             self.alpha[self.alpha > self.C] = self.C
-        indices = np.where((self.alpha > 0) & (self.alpha < self.C))
-        self.b = self.Y[indices] - np.dot(self.alpha * self.Y, self.kernelize(self.X, self.X[indices]))
+        self.indices = np.where((self.alpha > 0) & (self.alpha < self.C))[0]
+        self.b = self.Y[self.indices] - np.dot(self.alpha * self.Y, self.kernelize(self.X, self.X[self.indices]))
         self.b = np.mean(self.b)
-        self.support_vectors = indices
+        self.support_vectors = self.indices
         print(f'Total support vectors required for classification: {len(self.support_vectors)}')
         return self
     
@@ -162,6 +178,22 @@ class kprimalSVM(EvalC, loss, Kernels):
             return Kernels.cosine(x1, x2)
         elif self.kernel == 'correlation':
             return Kernels.correlation(x1, x2)
+        elif self.kernel == 'linrbf':
+            return Kernels.linrbf(x1, x2)
+        elif self.kernel == 'rbfpoly':
+            return Kernels.rbfpoly(x1, x2)
+        elif self.kernel == 'rbfcosine':
+            return Kernels.rbfpoly(x1, x2)
+        elif self.kernel == 'etakernel':
+            return Kernels.etakernel(x1, x2)
+        elif self.kernel == 'alignment':
+            return Kernels.alignment(x1, x2)
+        elif self.kernel == 'laplace':
+            return Kernels.laplacian(x1, x2)
+        elif self.kernel == 'locguass':
+            return Kernels.locguass(x1, x2)
+        elif self.kernel == 'chi':
+            return Kernels.chi(x1)
         
         
     def alpha_y_i_kernel(self, X, y):
@@ -246,6 +278,11 @@ kernelsvm.predict(X_test)
 kernelsvm.summary(Y_test, kernelsvm.predict(X_test), kernelsvm.alpha)
 plt.scatter(X_test[:, 0], X_test[:, 1], c = kernelsvm.predict(X_test))          
 
+#%% For Testing One class | SVDD Comparison
+kernelsvm = kDualSVM(kernel='rbf').fit(df, dy)
+kernelsvm.predict(X[:, [0, 1]])
+plt.scatter(X[:, 0], X[:, 1], c = kernelsvm.predict(X[:, [0, 1]]))  
+#%%
 
 primalkernelsvm = kprimalSVM(kernel='rbf').fit(X_train, Y_train)
 primalkernelsvm.predict(X_test)
@@ -257,7 +294,7 @@ plt.plot(np.arange(primalkernelsvm.iteration), primalkernelsvm.cost_rec)
 #%% Testing SVC from sklearn
 
 from sklearn.svm import SVC
-svc = SVC(C = 1.0, kernel = 'poly',gamma='auto')
+svc = SVC(C = 1.0, kernel = 'rbf',gamma='auto')
 svc.fit(X_train, Y_train)
 plt.scatter(X_test[:, 0], X_test[:, 1], c = svc.predict(X_test))
 
