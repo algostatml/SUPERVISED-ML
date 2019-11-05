@@ -50,6 +50,22 @@ class DualSVDD(EvalC, loss, Kernels):
             return Kernels.cosine(x1, x2)
         elif self.kernel == 'correlation':
             return Kernels.correlation(x1, x2)
+        elif self.kernel == 'linrbf':
+            return Kernels.linrbf(x1, x2)
+        elif self.kernel == 'rbfpoly':
+            return Kernels.rbfpoly(x1, x2)
+        elif self.kernel == 'rbfcosine':
+            return Kernels.rbfpoly(x1, x2)
+        elif self.kernel == 'etakernel':
+            return Kernels.etakernel(x1, x2)
+        elif self.kernel == 'alignment':
+            return Kernels.alignment(x1, x2)
+        elif self.kernel == 'laplace':
+            return Kernels.laplacian(x1, x2)
+        elif self.kernel == 'locguass':
+            return Kernels.locguass(x1, x2)
+        elif self.kernel == 'chi':
+            return Kernels.chi(x1)
     
     def cost(self):
         '''
@@ -63,7 +79,7 @@ class DualSVDD(EvalC, loss, Kernels):
         :params: X: NxD feature space
         :params: y: Dx1 dimension
         '''
-        alpha = np.random.randn(X.shape[0])
+        alpha = np.ones(X.shape[0])
         self.alph_s = np.outer(alpha, alpha) #alpha_i's alpha_j's
         self.y_i_s = self.y_i(y) #y_i's y_j's
         self.k = self.kernelize(X, X)
@@ -97,14 +113,15 @@ class DualSVDD(EvalC, loss, Kernels):
 #            self.alpha = self.alpha + self.lr * (np.dot(self.y_i_s * self.knl, self.alpha)) - np.dot(self.knl, self.Y)
             self.alpha[self.alpha < 0] = 0
             self.alpha[self.alpha > self.C] = self.C
-        self.indices = np.where((self.alpha > 0) & (self.alpha < self.C))
-        self.R = self.kernelize(self.X, self.X[self.indices]) - 2*np.dot(self.alpha, self.kernelize(self.X, self.X[self.indices]))+ self.alpha.dot(np.dot(self.alpha, self.kernelize(self.X, self.X[self.indices])))
+        self.indices = np.where((self.alpha > 0) & (self.alpha < self.C))[0]
+        self.R_squared = self.kernelize(self.X, self.X[self.indices]) - 2*np.dot(self.alpha, self.kernelize(self.X, self.X[self.indices])) + \
+                         self.alpha.dot(np.dot(self.alpha, self.kernelize(self.X, self.X[self.indices])))
         self.support_vectors = self.indices
         print(f'Total support vectors required for classification: {len(self.support_vectors)}')
         return self
     
     def predict(self, X):
-#        self.rho = self.kernelize(self.X, X) - 2*self.alpha.dot()
+#        self.b = self.kernelize(self.X, X) - 2*self.alpha.dot()
         yhat:int = np.sign(np.dot(self.alpha, self.kernelize(self.X, X)))
         return yhat
     
@@ -119,11 +136,11 @@ dy = X[X[:, 2] == 1][:, 2]
 plt.scatter(df[:, 0], df[:, 1])
 plt.scatter(X[:, 0], X[:, 1])
 X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3)
-dsvdd = DualSVDD().fit(df, dy)
+dsvdd = DualSVDD(kernel='rbf').fit(df, dy)
 plt.plot(np.arange(10), dsvdd.cost_rec)
 dsvdd.predict(X[:, [0, 1]])
 dsvdd.summary(Y_test, dsvdd.predict(X_test), dsvdd.alpha)  
-plt.scatter(X_test[:, 0], X_test[:, 1], c = dsvdd.predict(X_test))   
+plt.scatter(X[:, 0], X[:, 1], c = dsvdd.predict(X[:, [0, 1]]))   
 
 
 #%%
