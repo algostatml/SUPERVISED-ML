@@ -247,7 +247,7 @@ class kprimalSVM(EvalC, loss, Kernels):
             indices = np.where(self.margin < 1)
             cost[ii] = self.cost()
             print(f"Cost of computation: {cost[ii]}")
-            #perform gradient ascent for maximization.
+            #perform gradient descent for maximization.
             self.alpha = self.alpha - self.lr * (self.knl.dot(self.alpha) - self.C * self.Y[indices].dot(self.knl[indices]))
             self.b = self.b - self.lr * self.C * np.sum(self.Y[indices])
         #the support vectors are datapoints exactly on the margin
@@ -276,7 +276,7 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3)
 kernelsvm = kDualSVM(kernel='rbf').fit(X_train, Y_train)
 kernelsvm.predict(X_test)
 kernelsvm.summary(Y_test, kernelsvm.predict(X_test), kernelsvm.alpha)
-plt.scatter(X_test[:, 0], X_test[:, 1], c = kernelsvm.predict(X_test))          
+plt.scatter(X_test[:, 0], X_test[:, 1], c = kernelsvm.predict(X_test))      
 
 #%% For Testing One class | SVDD Comparison
 kernelsvm = kDualSVM(kernel='rbf').fit(df, dy)
