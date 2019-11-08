@@ -26,7 +26,7 @@ class kDualSVM(EvalC, loss, Kernels):
         else:
             self.kernel = kernel
         if not C:
-            C = 1.0
+            C = 0.1
             self.C = C
         else:
             self.C = C
@@ -279,9 +279,15 @@ kernelsvm.summary(Y_test, kernelsvm.predict(X_test), kernelsvm.alpha)
 plt.scatter(X_test[:, 0], X_test[:, 1], c = kernelsvm.predict(X_test))      
 
 #%% For Testing One class | SVDD Comparison
-kernelsvm = kDualSVM(kernel='rbf').fit(df, dy)
+kernelsvm = kDualSVM(kernel='linear').fit(df, dy)
 kernelsvm.predict(X[:, [0, 1]])
-plt.scatter(X[:, 0], X[:, 1], c = kernelsvm.predict(X[:, [0, 1]]))  
+plt.scatter(X[:, 0], X[:, 1], c = kernelsvm.predict(X[:, [0, 1]]))
+kernelsvm.summary(y, kernelsvm.predict(X[:, [0, 1]]), kernelsvm.alpha)
+
+#%% Thyroid Dataset
+kernelsvm = kDualSVM(kernel='rbf').fit(Xsample, ysample)
+pred = kernelsvm.predict(sample[:, :-1])
+kernelsvm.summary(dfy, pred, kernelsvm.alpha)
 #%%
 
 primalkernelsvm = kprimalSVM(kernel='rbf').fit(X_train, Y_train)
