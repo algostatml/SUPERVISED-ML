@@ -9,13 +9,18 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 np.random.seed(1111)
+from sklearn.metrics import roc_auc_score
 from DualSVDD import DualSVDD, DualSVDD_NE, MiniDualSVDD, MiniDualSVDD_NE
+from linearSVDD import linearSVDD, linearSVDD_NE
+from svm import linearSVM, StochasticlinearSVM
+from kernelSVM import kDualSVM, kprimalSVM
 np.random.seed(1000)
 plt.rcParams.update({'font.size': 8})
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.rcParams['figure.dpi'] = 200
 
+#generate dataset for testing SVDD
 def SVDDdataset(n_samples= None, outlier_size = None, n_features = None):
     if not n_samples:
         n_samples = 1000
@@ -48,25 +53,213 @@ dy = X[X[:, 2] == 1][:, 2]
 #plt.scatter(X[:, 0], X[:, 1])
 #plt.scatter(X[:, 0], X[:, 1], c = y, s = 5, cmap = 'coolwarm_r')
 
+
 #%%
+kernels  = ['linear', 'rbf', 'sigmoid', 'polynomial',
+            'linrbf', 'rbfpoly', 'etakernel', 'laplace']
+
+comparing = ['svdd_ne', 'svdd_e', 'svm_ne', 'svm_e']
+
+kernel_outcome = {'linear': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'aurroc': [],}, 
+                             'rbf': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'aurroc': []}, 
+                             'sigmoid': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'aurroc': []}, 
+                             'polynomial': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'aurroc': []},
+                             'linrbf': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'aurroc': []},
+                             'rbfpoly': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'aurroc': []},
+                             'etakernel': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'aurroc': []},
+                             'laplace': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'aurroc': []}}
+
+for ij in comparing:
+    for ii in kernels:
+        if ii == 'linear':
+            if ij == 'svdd_e':
+                #--svdd with error
+                start = time.time()
+                linsvdd = linearSVDD(kernel='linear').fit(df)
+                end = time.time() - start
+                kernel_outcome[ii][ij] = linsvdd.predict(X[:, [0, 1]])
+                kernel_outcome[ii]['time'].append(end)
+                kernel_outcome[ii]['acc'].append(linsvdd.accuracy(y, linsvdd.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['prec'].append(linsvdd.precision(y, linsvdd.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['rec'].append(linsvdd.recall(y, linsvdd.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['f1'].append(linsvdd.f1(y, linsvdd.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['aurroc'].append(roc_auc_score(y, linsvdd.predict(X[:, [0, 1]])))
+            elif ij == 'svdd_ne':
+                start = time.time()
+                linsvdd_ne = linearSVDD_NE(kernel='linear').fit(df)
+                end = time.time() - start
+                kernel_outcome[ii][ij] = linsvdd_ne.predict(X[:, [0, 1]])
+                kernel_outcome[ii]['time'].append(end)
+                kernel_outcome[ii]['acc'].append(linsvdd_ne.accuracy(y, linsvdd_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['prec'].append(linsvdd_ne.precision(y, linsvdd_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['rec'].append(linsvdd_ne.recall(y, linsvdd_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['f1'].append(linsvdd_ne.f1(y, linsvdd_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['aurroc'].append(roc_auc_score(y, linsvdd_ne.predict(X[:, [0, 1]])))
+            elif ij == 'svm_ne':
+                start = time.time()
+                linsvm_ne = StochasticlinearSVM().fit(X[:, [0, 1]], y)
+                end = time.time() - start
+                kernel_outcome[ii][ij] = linsvm_ne.predict(X[:, [0, 1]])
+                kernel_outcome[ii]['time'].append(end)
+                kernel_outcome[ii]['acc'].append(linsvm_ne.accuracy(y, linsvm_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['prec'].append(linsvm_ne.precision(y, linsvm_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['rec'].append(linsvm_ne.recall(y, linsvm_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['f1'].append(linsvm_ne.f1(y, linsvm_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['aurroc'].append(roc_auc_score(y, linsvm_ne.predict(X[:, [0, 1]])))
+            elif ij == 'svm_e':
+                start = time.time()
+                ksvm_e = kDualSVM(kernel = ii).fit(X[:, [0, 1]], y)
+                end = time.time() - start
+                kernel_outcome[ii][ij] = ksvm_e.predict(X[:, [0, 1]])
+                kernel_outcome[ii]['time'].append(end)
+                kernel_outcome[ii]['acc'].append(ksvm_e.accuracy(y, ksvm_e.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['prec'].append(ksvm_e.precision(y, ksvm_e.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['rec'].append(ksvm_e.recall(y, ksvm_e.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['f1'].append(ksvm_e.f1(y, ksvm_e.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['aurroc'].append(roc_auc_score(y, ksvm_e.predict(X[:, [0, 1]])))
+        else:
+            if ij == 'svdd_e':
+                #--svdd with error
+                start = time.time()
+                minisvdd = MiniDualSVDD(kernel = ii).fit(df)
+                end = time.time() - start
+                kernel_outcome[ii][ij] = minisvdd.predict(X[:, [0, 1]])
+                kernel_outcome[ii]['time'].append(end)
+                kernel_outcome[ii]['acc'].append(minisvdd.accuracy(y, minisvdd.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['prec'].append(minisvdd.precision(y, minisvdd.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['rec'].append(minisvdd.recall(y, minisvdd.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['f1'].append(minisvdd.f1(y, minisvdd.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['aurroc'].append(roc_auc_score(y, minisvdd.predict(X[:, [0, 1]])))
+            elif ij == 'svdd_ne':
+                #--svdd with error
+                start = time.time()
+                minisvdd_ne = MiniDualSVDD_NE(kernel = ii).fit(df)
+                end = time.time() - start
+                kernel_outcome[ii][ij] = minisvdd_ne.predict(X[:, [0, 1]])
+                kernel_outcome[ii]['time'].append(end)
+                kernel_outcome[ii]['acc'].append(minisvdd_ne.accuracy(y, minisvdd_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['prec'].append(minisvdd_ne.precision(y, minisvdd_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['rec'].append(minisvdd_ne.recall(y, minisvdd_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['f1'].append(minisvdd_ne.f1(y, minisvdd_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['aurroc'].append(roc_auc_score(y, minisvdd_ne.predict(X[:, [0, 1]])))
+            elif ij == 'svm_ne':
+                #--svdd with error
+                start = time.time()
+                kprimal_ne = kprimalSVM(kernel = ii).fit(X[:, [0, 1]], y)
+                end = time.time() - start
+                kernel_outcome[ii][ij] = kprimal_ne.predict(X[:, [0, 1]])
+                kernel_outcome[ii]['time'].append(end)
+                kernel_outcome[ii]['acc'].append(kprimal_ne.accuracy(y, kprimal_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['prec'].append(kprimal_ne.precision(y, kprimal_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['rec'].append(kprimal_ne.recall(y, kprimal_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['f1'].append(kprimal_ne.f1(y, kprimal_ne.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['aurroc'].append(roc_auc_score(y, kprimal_ne.predict(X[:, [0, 1]])))
+            elif ij == 'svm_e':
+                #--svdd with error
+                start = time.time()
+                kduall_e = kDualSVM(kernel = ii).fit(df, dy)
+                end = time.time() - start
+                kernel_outcome[ii][ij] = kduall_e.predict(X[:, [0, 1]])
+                kernel_outcome[ii]['time'].append(end)
+                kernel_outcome[ii]['acc'].append(kduall_e.accuracy(y, kduall_e.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['prec'].append(kduall_e.precision(y, kduall_e.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['rec'].append(kduall_e.recall(y, kduall_e.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['f1'].append(kduall_e.f1(y, kduall_e.predict(X[:, [0, 1]])))
+                kernel_outcome[ii]['aurroc'].append(roc_auc_score(y, kduall_e.predict(X[:, [0, 1]])))
+
+
+                    
+#%%                   
+s = .5
+color = 'coolwarm_r'
+fig, ax = plt.subplots(4, 8, figsize=(12, 4),gridspec_kw=dict(hspace=0, wspace=0),
+                       subplot_kw={'xticks':[], 'yticks':[]})
+#--linear
+ax[0, 0].scatter(X[:, 0], X[:, 1], c = kernel_outcome['linear']['svdd_ne'], s = 1, cmap = color)
+ax[1, 0].scatter(X[:, 0], X[:, 1], c = kernel_outcome['linear']['svdd_e'], s = 1, cmap = color)
+ax[2, 0].scatter(X[:, 0], X[:, 1], c = kernel_outcome['linear']['svm_ne'], s = 1, cmap = color)
+ax[3, 0].scatter(X[:, 0], X[:, 1], c = kernel_outcome['linear']['svm_e'], s = 1, cmap = color)
+
+#--rbf
+ax[0, 1].scatter(X[:, 0], X[:, 1], c = kernel_outcome['rbf']['svdd_ne'], s = 1, cmap = color)
+ax[1, 1].scatter(X[:, 0], X[:, 1], c = kernel_outcome['rbf']['svdd_e'], s = 1, cmap = color)
+ax[2, 1].scatter(X[:, 0], X[:, 1], c = kernel_outcome['rbf']['svm_ne'], s = 1, cmap = color)
+ax[3, 1].scatter(X[:, 0], X[:, 1], c = kernel_outcome['rbf']['svm_e'], s = 1, cmap = color)
+
+#--poly
+ax[0, 2].scatter(X[:, 0], X[:, 1], c = kernel_outcome['polynomial']['svdd_ne'], s = 1, cmap = color)
+ax[1, 2].scatter(X[:, 0], X[:, 1], c = kernel_outcome['polynomial']['svdd_e'], s = 1, cmap = color)
+ax[2, 2].scatter(X[:, 0], X[:, 1], c = kernel_outcome['polynomial']['svm_ne'], s = 1, cmap = color)
+ax[3, 2].scatter(X[:, 0], X[:, 1], c = kernel_outcome['polynomial']['svm_e'], s = 1, cmap = color)
+
+#--sigmoid
+ax[0, 3].scatter(X[:, 0], X[:, 1], c = kernel_outcome['sigmoid']['svdd_ne'], s = 1, cmap = color)
+ax[1, 3].scatter(X[:, 0], X[:, 1], c = kernel_outcome['sigmoid']['svdd_e'], s = 1, cmap = color)
+ax[2, 3].scatter(X[:, 0], X[:, 1], c = kernel_outcome['sigmoid']['svm_ne'], s = 1, cmap = color)
+ax[3, 3].scatter(X[:, 0], X[:, 1], c = kernel_outcome['sigmoid']['svm_e'], s = 1, cmap = color)
+
+#--laplace
+ax[0, 4].scatter(X[:, 0], X[:, 1], c = kernel_outcome['laplace']['svdd_ne'], s = 1, cmap = color)
+ax[1, 4].scatter(X[:, 0], X[:, 1], c = kernel_outcome['laplace']['svdd_e'], s = 1, cmap = color)
+ax[2, 4].scatter(X[:, 0], X[:, 1], c = kernel_outcome['laplace']['svm_ne'], s = 1, cmap = color)
+ax[3, 4].scatter(X[:, 0], X[:, 1], c = kernel_outcome['laplace']['svm_e'], s = 1, cmap = color)
+
+#--rbfpoly
+ax[0, 5].scatter(X[:, 0], X[:, 1], c = kernel_outcome['rbfpoly']['svdd_ne'], s = 1, cmap = color)
+ax[1, 5].scatter(X[:, 0], X[:, 1], c = kernel_outcome['rbfpoly']['svdd_e'], s = 1, cmap = color)
+ax[2, 5].scatter(X[:, 0], X[:, 1], c = kernel_outcome['rbfpoly']['svm_ne'], s = 1, cmap = color)
+ax[3, 5].scatter(X[:, 0], X[:, 1], c = kernel_outcome['rbfpoly']['svm_e'], s = 1, cmap = color)
+
+#--linrbf
+ax[0, 6].scatter(X[:, 0], X[:, 1], c = kernel_outcome['linrbf']['svdd_ne'], s = 1, cmap = color)
+ax[1, 6].scatter(X[:, 0], X[:, 1], c = kernel_outcome['linrbf']['svdd_e'], s = 1, cmap = color)
+ax[2, 6].scatter(X[:, 0], X[:, 1], c = kernel_outcome['linrbf']['svm_ne'], s = 1, cmap = color)
+ax[3, 6].scatter(X[:, 0], X[:, 1], c = kernel_outcome['linrbf']['svm_e'], s = 1, cmap = color)
+
+#--etakernel
+ax[0, 7].scatter(X[:, 0], X[:, 1], c = kernel_outcome['etakernel']['svdd_ne'], s = 1, cmap = color)
+ax[1, 7].scatter(X[:, 0], X[:, 1], c = kernel_outcome['etakernel']['svdd_e'], s = 1, cmap = color)
+ax[2, 7].scatter(X[:, 0], X[:, 1], c = kernel_outcome['etakernel']['svm_ne'], s = 1, cmap = color)
+ax[3, 7].scatter(X[:, 0], X[:, 1], c = kernel_outcome['etakernel']['svm_e'], s = 1, cmap = color)
+
+
+ax[0, 0].set_title('linear')
+ax[0, 1].set_title('rbf')
+ax[0, 2].set_title('poly')
+ax[0, 3].set_title('sigmoid')
+ax[0, 4].set_title('laplace')
+ax[0, 5].set_title('rbfpoly')
+ax[0, 6].set_title('linrbf')
+ax[0, 7].set_title('etakernel')
+ax[0, 0].set_ylabel('SVDD No Error')
+ax[1, 0].set_ylabel('SVDD Error')
+ax[2, 0].set_ylabel('SVM No Error')
+ax[3, 0].set_ylabel('SVM Error')
+fig.set_tight_layout(True)
+
+
+
+#%%
+
 from sklearn.metrics import roc_auc_score
-dsvdd = DualSVDD(kernel='linear').fit(df)
+dsvdd = linearSVDD(kernel='linear').fit(df)
 #plt.plot(np.arange(100), dsvdd.cost_rec)
+
 dsvdd.predict(X[:, [0, 1]])
 dsvdd.summary(y, dsvdd.predict(X[:, [0, 1]]), dsvdd.alpha)
-plt.scatter(X[:, 0], X[:, 1], c = dsvdd.predict(X[:, [0, 1]]), cmap = 'coolwarm_r', s = 1)
-roc_auc_score(y, dsvdd.predict(X[:, [0, 1]]))
+plt.scatter(X[:, 0], X[:, 1], c = np.sign(X[:, [0, 1]].dot(dsvdd.R_squared) -0.5*x.diagonal() + R_squared), cmap = 'coolwarm_r', s = 5)
+roc_auc_score(y, np.sign(X[:, [0, 1]].dot(dsvdd.R_squared) -0.5*x.diagonal()))
 #%% SVDD-GD No Errors
 dsvddNE = DualSVDD_NE(kernel='rbf').fit(df)
 plt.plot(np.arange(100), dsvddNE.cost_rec)
 dsvddNE.predict(X[:, [0, 1]])
-plt.scatter(X[:, 0], X[:, 1], c = dsvddNE.predict(X[:, [0, 1]]))
-
+plt.scatter(X[:, 0], X[:, 1], c = dsvddNE.predict(X[:, [0, 1]]), cmap = 'coolwarm_r', s = 1)
+roc_auc_score(y, dsvddNE.predict(X[:, [0, 1]]))
 
 #%% Minibatch with Errors
 from sklearn.metrics import roc_auc_score
-stochdsvdd = MiniDualSVDD(kernel='locguass').fit(df)
-#plt.plot(np.arange(100), stochdsvdd.cost_rec)
+stochdsvdd = MiniDualSVDD(kernel='rbf').fit(df)
+plt.plot(np.arange(100), stochdsvdd.cost_rec)
 stochdsvdd.predict(X[:, [0, 1]])
 stochdsvdd.summary(y, stochdsvdd.predict(X[:, [0, 1]]), stochdsvdd.alpha)
 plt.scatter(X[:, 0], X[:, 1], c = stochdsvdd.predict(X[:, [0, 1]]), cmap = 'coolwarm_r', s = 1)
@@ -97,123 +290,4 @@ def plot_decision_boundary(clf, X, Y, cmap='coolwarm_r'):
 plot_decision_boundary(dsvdd, X, y, cmap='coolwarm_r')
 
 
-#%%
 
-kernels  = ['linear', 'rbf', 'sigmoid', 'polynomial',
-            'linrbf', 'rbfpoly', 'etakernel', 'laplace']
-
-
-kernel_outcome = {'linear': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'impr_f1': []}, 
-                             'rbf': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'impr_f1': []}, 
-                             'sigmoid': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'impr_f1': []}, 
-                             'polynomial': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'impr_f1': []},
-                             'linrbf': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'impr_f1': []},
-                             'rbfpoly': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'impr_f1': []},
-                             'etakernel': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'impr_f1': []},
-                             'laplace': {'time': [], 'acc': [], 'prec': [], 'rec': [], 'f1': [], 'impr_f1': []}}
-
-for _ in range(3):
-    for p, q in train_test.items():
-        for ii in kernels:
-            if ii == 'linear':
-                start = time.time()
-                logit = stochasticLogistic(0.1, 10).fit(q['train'][0], q['train'][1])
-                end = time.time() - start
-                kernel_outcome[ii][f'{p}'] = logit.predict(q['test'][0])
-                kernel_outcome[ii]['time'].append(end)
-                kernel_outcome[ii]['acc'].append(logit.accuracy(q['test'][1], logit.predict(q['test'][0])))
-                kernel_outcome[ii]['prec'].append(logit.precision(q['test'][1], logit.predict(q['test'][0])))
-                kernel_outcome[ii]['rec'].append(logit.recall(q['test'][1], logit.predict(q['test'][0])))
-                kernel_outcome[ii]['f1'].append(logit.f1(q['test'][1], logit.predict(q['test'][0])))
-                kernel_outcome[ii]['impr_f1'].append(logit.fscore(q['test'][1], logit.predict(q['test'][0]), logit.alpha))
-            else:
-                if p == 'blob':
-                    start = time.time()
-                    klogit = StochKLR(kernel = ii).fit(q['train'][0], q['train'][1], iterations=50)
-                    end = time.time() - start
-                    start = time.time()
-                    kernel_outcome[ii][f'{p}'] = klogit.predict(q['test'][0])
-                    kernel_outcome[ii]['time'].append(end)
-                    kernel_outcome[ii]['acc'].append(klogit.accuracy(q['test'][1], klogit.predict(q['test'][0])))
-                    kernel_outcome[ii]['prec'].append(klogit.precision(q['test'][1], klogit.predict(q['test'][0])))
-                    kernel_outcome[ii]['rec'].append(klogit.recall(q['test'][1], klogit.predict(q['test'][0])))
-                    kernel_outcome[ii]['f1'].append(klogit.f1(q['test'][1], klogit.predict(q['test'][0])))
-                    kernel_outcome[ii]['impr_f1'].append(klogit.fscore(q['test'][1], klogit.predict(q['test'][0]), klogit.alpha))
-                else:
-                    start = time.time()
-                    klogit = StochKLR(kernel = ii).fit(q['train'][0], q['train'][1], iterations=10)
-                    end = time.time() - start
-                    start = time.time()
-                    kernel_outcome[ii][f'{p}'] = klogit.predict(q['test'][0])
-                    kernel_outcome[ii]['time'].append(end)
-                    kernel_outcome[ii]['acc'].append(klogit.accuracy(q['test'][1], klogit.predict(q['test'][0])))
-                    kernel_outcome[ii]['prec'].append(klogit.precision(q['test'][1], klogit.predict(q['test'][0])))
-                    kernel_outcome[ii]['rec'].append(klogit.recall(q['test'][1], klogit.predict(q['test'][0])))
-                    kernel_outcome[ii]['f1'].append(klogit.f1(q['test'][1], klogit.predict(q['test'][0])))
-                    kernel_outcome[ii]['impr_f1'].append(klogit.fscore(q['test'][1], klogit.predict(q['test'][0]), klogit.alpha))
-                    
-#%%                   
-s = .5
-color = 'coolwarm_r'
-fig, ax = plt.subplots(4, 9, figsize=(12, 4),gridspec_kw=dict(hspace=0, wspace=0),
-                       subplot_kw={'xticks':[], 'yticks':[]})
-
-ax[0, 0].scatter(train_test['moon']['train'][0][:, 0], train_test['moon']['train'][0][:, 1], c = train_test['moon']['train'][1], s = 1, cmap = color)
-ax[1, 0].scatter(train_test['blob']['train'][0][:, 0], train_test['blob']['train'][0][:, 1], c = train_test['blob']['train'][1], s = 1, cmap = color)
-ax[2, 0].scatter(train_test['circle']['train'][0][:, 0], train_test['circle']['train'][0][:, 1], c = train_test['circle']['train'][1], s = 1, cmap = color)
-ax[3, 0].scatter(train_test['class']['train'][0][:, 0], train_test['class']['train'][0][:, 1], c = train_test['class']['train'][1], s = 1, cmap = color)
-
-ax[0, 1].scatter(train_test['moon']['test'][0][:, 0], train_test['moon']['test'][0][:, 1], c = kernel_outcome['linear']['moon'], s = 1, cmap = color)
-ax[1, 1].scatter(train_test['blob']['test'][0][:, 0], train_test['blob']['test'][0][:, 1], c = kernel_outcome['linear']['blob'], s = 1, cmap = color)
-ax[2, 1].scatter(train_test['circle']['test'][0][:, 0], train_test['circle']['test'][0][:, 1], c = kernel_outcome['linear']['circle'], s = 1, cmap = color)
-ax[3, 1].scatter(train_test['class']['test'][0][:, 0], train_test['class']['test'][0][:, 1], c = kernel_outcome['linear']['class'], s = 1, cmap = color)
-
-ax[0, 2].scatter(train_test['moon']['test'][0][:, 0], train_test['moon']['test'][0][:, 1], c = kernel_outcome['rbf']['moon'], s = 1, cmap = color)
-ax[1, 2].scatter(train_test['blob']['test'][0][:, 0], train_test['blob']['test'][0][:, 1], c = kernel_outcome['rbf']['blob'], s = 1, cmap = color)
-ax[2, 2].scatter(train_test['circle']['test'][0][:, 0], train_test['circle']['test'][0][:, 1], c = kernel_outcome['rbf']['circle'], s = 1, cmap = color)
-ax[3, 2].scatter(train_test['class']['test'][0][:, 0], train_test['class']['test'][0][:, 1], c = kernel_outcome['rbf']['class'], s = 1, cmap = color)
-
-ax[0, 3].scatter(train_test['moon']['test'][0][:, 0], train_test['moon']['test'][0][:, 1], c = kernel_outcome['sigmoid']['moon'], s = 1, cmap = color)
-ax[1, 3].scatter(train_test['blob']['test'][0][:, 0], train_test['blob']['test'][0][:, 1], c = kernel_outcome['sigmoid']['blob'], s = 1, cmap = color)
-ax[2, 3].scatter(train_test['circle']['test'][0][:, 0], train_test['circle']['test'][0][:, 1], c = kernel_outcome['sigmoid']['circle'], s = 1, cmap = color)
-ax[3, 3].scatter(train_test['class']['test'][0][:, 0], train_test['class']['test'][0][:, 1], c = kernel_outcome['sigmoid']['class'], s = 1, cmap = color)
-
-ax[0, 4].scatter(train_test['moon']['test'][0][:, 0], train_test['moon']['test'][0][:, 1], c = kernel_outcome['polynomial']['moon'], s = 1, cmap = color)
-ax[1, 4].scatter(train_test['blob']['test'][0][:, 0], train_test['blob']['test'][0][:, 1], c = kernel_outcome['polynomial']['blob'], s = 1, cmap = color)
-ax[2, 4].scatter(train_test['circle']['test'][0][:, 0], train_test['circle']['test'][0][:, 1], c = kernel_outcome['polynomial']['circle'], s = 1, cmap = color)
-ax[3, 4].scatter(train_test['class']['test'][0][:, 0], train_test['class']['test'][0][:, 1], c = kernel_outcome['polynomial']['class'], s = 1, cmap = color)
-
-ax[0, 5].scatter(train_test['moon']['test'][0][:, 0], train_test['moon']['test'][0][:, 1], c = kernel_outcome['laplace']['moon'], s = 1, cmap = color)
-ax[1, 5].scatter(train_test['blob']['test'][0][:, 0], train_test['blob']['test'][0][:, 1], c = kernel_outcome['laplace']['blob'], s = 1, cmap = color)
-ax[2, 5].scatter(train_test['circle']['test'][0][:, 0], train_test['circle']['test'][0][:, 1], c = kernel_outcome['laplace']['circle'], s = 1, cmap = color)
-ax[3, 5].scatter(train_test['class']['test'][0][:, 0], train_test['class']['test'][0][:, 1], c = kernel_outcome['laplace']['class'], s = 1, cmap = color)
-
-ax[0, 6].scatter(train_test['moon']['test'][0][:, 0], train_test['moon']['test'][0][:, 1], c = kernel_outcome['linrbf']['moon'], s = 1, cmap = color)
-ax[1, 6].scatter(train_test['blob']['test'][0][:, 0], train_test['blob']['test'][0][:, 1], c = kernel_outcome['linrbf']['blob'], s = 1, cmap = color)
-ax[2, 6].scatter(train_test['circle']['test'][0][:, 0], train_test['circle']['test'][0][:, 1], c = kernel_outcome['linrbf']['circle'], s = 1, cmap = color)
-ax[3, 6].scatter(train_test['class']['test'][0][:, 0], train_test['class']['test'][0][:, 1], c = kernel_outcome['linrbf']['class'], s = 1, cmap = color)
-
-ax[0, 7].scatter(train_test['moon']['test'][0][:, 0], train_test['moon']['test'][0][:, 1], c = kernel_outcome['rbfpoly']['moon'], s = 1, cmap = color)
-ax[1, 7].scatter(train_test['blob']['test'][0][:, 0], train_test['blob']['test'][0][:, 1], c = kernel_outcome['rbfpoly']['blob'], s = 1, cmap = color)
-ax[2, 7].scatter(train_test['circle']['test'][0][:, 0], train_test['circle']['test'][0][:, 1], c = kernel_outcome['rbfpoly']['circle'], s = 1, cmap = color)
-ax[3, 7].scatter(train_test['class']['test'][0][:, 0], train_test['class']['test'][0][:, 1], c = kernel_outcome['rbfpoly']['class'], s = 1, cmap = color)
-
-ax[0, 8].scatter(train_test['moon']['test'][0][:, 0], train_test['moon']['test'][0][:, 1], c = kernel_outcome['etakernel']['moon'], s = 1, cmap = color)
-ax[1, 8].scatter(train_test['blob']['test'][0][:, 0], train_test['blob']['test'][0][:, 1], c = kernel_outcome['etakernel']['blob'], s = 1, cmap = color)
-ax[2, 8].scatter(train_test['circle']['test'][0][:, 0], train_test['circle']['test'][0][:, 1], c = kernel_outcome['etakernel']['circle'], s = 1, cmap = color)
-ax[3, 8].scatter(train_test['class']['test'][0][:, 0], train_test['class']['test'][0][:, 1], c = kernel_outcome['etakernel']['class'], s = 1, cmap = color)
-
-ax[0, 0].set_title('original')
-ax[0, 1].set_title('linear')
-ax[0, 2].set_title('rbf')
-ax[0, 3].set_title('poly')
-ax[0, 4].set_title('sigmoid')
-ax[0, 5].set_title('laplace')
-ax[0, 6].set_title('rbfpoly')
-ax[0, 7].set_title('linrbf')
-ax[0, 8].set_title('etakernel')
-ax[0, 0].set_ylabel('Moons')
-ax[1, 0].set_ylabel('Blob')
-ax[2, 0].set_ylabel('Circle')
-ax[3, 0].set_ylabel('Classifciation')
-fig.set_tight_layout(True)
