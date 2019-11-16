@@ -26,7 +26,7 @@ class kDualSVM(EvalC, loss, Kernels):
         else:
             self.kernel = kernel
         if not C:
-            C = 0.1
+            C = .01
             self.C = C
         else:
             self.C = C
@@ -150,7 +150,7 @@ class kprimalSVM(EvalC, loss, Kernels):
         else:
             self.kernel = kernel
         if not C:
-            C = 1.0
+            C = .01
             self.C = C
         else:
             self.C = C
@@ -266,43 +266,43 @@ class kprimalSVM(EvalC, loss, Kernels):
     
     
 #%% Testing
-import matplotlib.pyplot as plt
-from sklearn.datasets import make_blobs, make_moons
-from sklearn.model_selection import train_test_split
-X, y = make_moons(1000)
-X, y = make_blobs(n_samples=1000, centers=2, n_features=2)
-#X = np.c_[np.ones(X.shape[0]), X]
-X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3)
-kernelsvm = kDualSVM(kernel='rbf').fit(X_train, Y_train)
-kernelsvm.predict(X_test)
-kernelsvm.summary(Y_test, kernelsvm.predict(X_test), kernelsvm.alpha)
-plt.scatter(X_test[:, 0], X_test[:, 1], c = kernelsvm.predict(X_test))      
-
-#%% For Testing One class | SVDD Comparison
-kernelsvm = kDualSVM(kernel='linear').fit(df, dy)
-kernelsvm.predict(X[:, [0, 1]])
-plt.scatter(X[:, 0], X[:, 1], c = kernelsvm.predict(X[:, [0, 1]]))
-kernelsvm.summary(y, kernelsvm.predict(X[:, [0, 1]]), kernelsvm.alpha)
-
-#%% Thyroid Dataset
-kernelsvm = kDualSVM(kernel='rbf').fit(Xsample, ysample)
-pred = kernelsvm.predict(sample[:, :-1])
-kernelsvm.summary(dfy, pred, kernelsvm.alpha)
-#%%
-
-primalkernelsvm = kprimalSVM(kernel='rbf').fit(X_train, Y_train)
-primalkernelsvm.predict(X_test)
-primalkernelsvm.summary(Y_test, primalkernelsvm.predict(X_test), primalkernelsvm.alpha)
-plt.scatter(X_test[:, 0], X_test[:, 1], c = primalkernelsvm.predict(X_test))          
-plt.plot(np.arange(primalkernelsvm.iteration), primalkernelsvm.cost_rec)            
-       
-           
-#%% Testing SVC from sklearn
-
-from sklearn.svm import SVC
-svc = SVC(C = 1.0, kernel = 'rbf',gamma='auto')
-svc.fit(X_train, Y_train)
-plt.scatter(X_test[:, 0], X_test[:, 1], c = svc.predict(X_test))
+#import matplotlib.pyplot as plt
+#from sklearn.datasets import make_blobs, make_moons
+#from sklearn.model_selection import train_test_split
+#X, y = make_moons(1000)
+#X, y = make_blobs(n_samples=1000, centers=2, n_features=2)
+##X = np.c_[np.ones(X.shape[0]), X]
+#X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3)
+#kernelsvm = kDualSVM(kernel='rbf').fit(X_train, Y_train)
+#kernelsvm.predict(X_test)
+#kernelsvm.summary(Y_test, kernelsvm.predict(X_test), kernelsvm.alpha)
+#plt.scatter(X_test[:, 0], X_test[:, 1], c = kernelsvm.predict(X_test))      
+#
+##%% For Testing One class | SVDD Comparison
+#kernelsvm = kDualSVM(kernel='linear').fit(df, dy)
+#kernelsvm.predict(X[:, [0, 1]])
+#plt.scatter(X[:, 0], X[:, 1], c = kernelsvm.predict(X[:, [0, 1]]))
+#kernelsvm.summary(y, kernelsvm.predict(X[:, [0, 1]]), kernelsvm.alpha)
+#
+##%% Thyroid Dataset
+#kernelsvm = kDualSVM(kernel='rbf').fit(Xsample, ysample)
+#pred = kernelsvm.predict(sample[:, :-1])
+#kernelsvm.summary(dfy, pred, kernelsvm.alpha)
+##%%
+#
+#primalkernelsvm = kprimalSVM(kernel='rbf').fit(X_train, Y_train)
+#primalkernelsvm.predict(X_test)
+#primalkernelsvm.summary(Y_test, primalkernelsvm.predict(X_test), primalkernelsvm.alpha)
+#plt.scatter(X_test[:, 0], X_test[:, 1], c = primalkernelsvm.predict(X_test))          
+#plt.plot(np.arange(primalkernelsvm.iteration), primalkernelsvm.cost_rec)            
+#       
+#           
+##%% Testing SVC from sklearn
+#
+#from sklearn.svm import SVC
+#svc = SVC(C = 1.0, kernel = 'rbf',gamma='auto')
+#svc.fit(X_train, Y_train)
+#plt.scatter(X_test[:, 0], X_test[:, 1], c = svc.predict(X_test))
 
 
 
