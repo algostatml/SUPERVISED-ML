@@ -65,12 +65,11 @@ class Perceptron(object):
         self.alpha = alpha
         self.beta = np.zeros(X.shape[1])
         self.pred = np.zeros(len(Y))
-        for ii in range(self.iterations):
-            for ij, (x_i, y_i) in enumerate(zip(X, Y)):
-                self.pred[ij] = Perceptron.tanh(X[ij], self.beta)
-                if self.pred[ij] != y_i:
-                    self.beta = self.beta + self.alpha * Perceptron.cost(y_i, self.pred[ij])*x_i
-                print(f'{self.beta}')
+        for ij, (x_i, y_i) in enumerate(zip(X, Y)):
+            self.pred[ij] = Perceptron.tanh(X[ij], self.beta)
+            if self.pred[ij] != y_i:
+                self.beta = self.beta + self.alpha * Perceptron.cost(y_i, self.pred[ij])*x_i
+            print(f'{self.beta}')
         return self
     
     def predict(self, X):
@@ -89,5 +88,5 @@ class Perceptron(object):
 pcp = Perceptron().fit(X_train, Y_train, 0.001, 100)
 
 import matplotlib.pyplot as plt
-plt.scatter(X_train[:, 1], X_train[:, 2], c = pcp.predict(X_train))
+plt.scatter(X_train[:, 0], X_train[:, 1], c = pcp.predict(X_train))
 np.sum(Y_test == pcp.predict(X_test))/len(Y_test)
