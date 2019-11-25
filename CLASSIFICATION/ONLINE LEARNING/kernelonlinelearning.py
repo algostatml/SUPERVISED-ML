@@ -15,6 +15,13 @@ from tau_update import tau
 
 class kernelpassiveAggr(EvalC, Kernels, loss, tau):
     def __init__(self, kernel = None, gamma = None, d = None, C = None):
+        '''Kernellized Passive Aggressive Algorithm
+        :param: kernel: string specifying type of kernel
+                        Default is linear
+        :param: gamma: scalar value
+        :param: d: polynomial degree. Used by polynomial kernels
+        :param: C: penalty cost parameter
+        '''
         if not kernel:
             kernel = 'linear'
             self.kernel= kernel
@@ -38,32 +45,35 @@ class kernelpassiveAggr(EvalC, Kernels, loss, tau):
         return
     
     def classictau(self, x, loss):
-        '''
+        ''' Classic Tau
         :param: x: NxD
         :param: loss
+        :return: classic tau scalar value
         '''
         return loss/self.kernelize(x, x)
     
     def f1_relax(self, x, loss, C):
-        '''
+        ''' f1 Relaxation
         :param: x: NxD
         :param: loss
         :param: C: constant
+        :return: f1-relaxation scalar value
         '''
         return min(C, loss/self.kernelize(x, x))
     
     def f2_relax(self, x, loss, C):
-        '''
+        '''f2 Relaxation
         :param: x: NxD
         :param: loss
         :param: C: constant
-        :return: f2-relaxation
+        :return: f2-relaxation scalar value
         '''
         return loss/(self.kernelize(x, x) + 2*C)
     
     def kernelize(self, x1, x2):
         '''
-        :params: X: NxD
+        :params: x1: NxD
+        :params: x2: NxD
         '''
         if self.kernel == 'linear':
             return Kernels.linear(x1, x2)
@@ -110,7 +120,7 @@ class kernelpassiveAggr(EvalC, Kernels, loss, tau):
         return y*(np.dot(alpha, self.kernelize(X, X)))
         
     def pred_update(self, X, alpha):
-        '''
+        '''kernel update
         :param: X: N x D
         :param: beta: D X 1
         '''
@@ -120,7 +130,6 @@ class kernelpassiveAggr(EvalC, Kernels, loss, tau):
         '''
         :params: X: train data
         :params: Y: train labels
-        :params: alpha: learning rate
         '''
         self.X = X
         self.alpha = np.random.randn(X.shape[0])
@@ -143,6 +152,13 @@ class kernelpassiveAggr(EvalC, Kernels, loss, tau):
 
 class kernelpassiveAggr_v2(EvalC, Kernels, loss, tau):
     def __init__(self, kernel = None, gamma = None, d = None, C = None):
+        '''Kernellized Passive Aggressive Algorithm
+        :param: kernel: string specifying type of kernel
+                        Default is linear
+        :param: gamma: scalar value
+        :param: d: polynomial degree. Used by polynomial kernels
+        :param: C: penalty cost parameter
+        '''
         if not kernel:
             kernel = 'linear'
             self.kernel= kernel
@@ -285,12 +301,19 @@ from sklearn.datasets import make_blobs, make_moons, make_circles
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 #X, y = make_blobs(n_samples=10000, centers = 2, n_features = 2, random_state=0)
+color = 'coolwarm_r'
+np.random.seed(1000)
+plt.rcParams.update({'font.size': 8})
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+plt.rcParams['figure.dpi'] = 200
+
 X, y = make_circles(n_samples=10000, factor=.05, noise=0.1)
 #X = np.c_[np.ones(X.shape[0]), X]
 X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3)
 psaggr = kernelpassiveAggr(kernel = 'rbf').fit(X_train, Y_train)
 #psaggr.predict(X_test)
-plt.scatter(X_test[:, 0], X_test[:, 1], c = psaggr.predict(X_test))
+plt.scatter(X_test[:, 0], X_test[:, 1], c = psaggr.predict(X_test), s = 1, cmap = color)
 
 
 
