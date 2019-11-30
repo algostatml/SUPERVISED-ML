@@ -28,17 +28,17 @@ class kernelpassiveAggr(EvalC, Kernels, loss, tau):
         else:
             self.kernel = kernel
         if not gamma:
-            gamma = 8
+            gamma = 10
             self.gamma = gamma
         else:
             self.gamma = gamma
         if not d:
-            d = 3
+            d = 5
             self.d = d
         else:
             self.d = d
         if not C:
-            C = .1
+            C = 0.1
             self.C = C
         else:
             self.C = C
@@ -132,22 +132,28 @@ class kernelpassiveAggr(EvalC, Kernels, loss, tau):
         :params: Y: train labels
         '''
         self.X = X
-        self.alpha = np.random.randn(X.shape[0])
-        self.pred = np.zeros(len(Y))
+        self.Y = Y
+        N, D = self.X.shape
+        self.pred = np.zeros(N)
+        self.alpha = np.ones(N)
+        self.s_t = []
         for ij, (x_i, y_i) in enumerate(zip(self.X, Y)):
             self.pred[ij] = self.pred_update(x_i, self.alpha[ij])
             self.l_t = self.activation(x_i, y_i, self.alpha[ij])
             print(f'Cost of computation: {self.l_t}')
-            self.t_t = self.classictau(x_i, self.l_t)
+            self.t_t = self.f2_relax(x_i, self.l_t, self.C)
             if self.pred[ij] != y_i:
                 self.alpha[ij] = self.alpha[ij] + self.t_t * y_i * self.kernelize(x_i, x_i)
+                self.s_t.append(x_i)
+        self.s_t = np.array(self.s_t) #support set
+        self.alpha = self.alpha[: len(self.s_t)] #support set hypothesis
         return self
     
     def predict(self, X):
         '''
         param: X_test = NxD feature matrix
         '''
-        return np.sign(np.dot(self.alpha, self.kernelize(self.X, X)))
+        return np.sign(np.dot(self.alpha, self.kernelize(self.s_t, X)))
     
 
 class kernelpassiveAggr_v2(EvalC, Kernels, loss, tau):
@@ -311,9 +317,8 @@ plt.rcParams['figure.dpi'] = 200
 X, y = make_circles(n_samples=10000, factor=.05, noise=0.1)
 #X = np.c_[np.ones(X.shape[0]), X]
 X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3)
-psaggr = kernelpassiveAggr(kernel = 'rbf').fit(X_train, Y_train)
-#psaggr.predict(X_test)
-plt.scatter(X_test[:, 0], X_test[:, 1], c = psaggr.predict(X_test), s = 1, cmap = color)
-
+psaggrkernel = kernelpassiveAggr(kernel = 'rbf').fit(X_train, Y_train)
+plt.scatter(X_test[:, 0], X_test[:, 1], c = psaggrkernel.predict(X_test), s = 1, cmap = color)
+EvalC.accuary_multiclass(Y_test, psaggrkernel.predict(X_test))
 
 
