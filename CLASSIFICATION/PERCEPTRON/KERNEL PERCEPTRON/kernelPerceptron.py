@@ -111,6 +111,6 @@ class kperceptron(Kernels, EvalC, loss):
     
 #%% Testing Kernel Perceptron
 color = 'coolwarm_r'
-kpctron = kperceptron(kernel = 'locguass').fit(X_train, Y_train)
-pred = kpctron.predict(X_test)
+kpctron = kperceptron(kernel = 'linear').fit(X_train, Y_train)
+#pred = kpctron.predict(X_test)
 plt.scatter(X_test[:, 0], X_test[:, 1], c = kpctron.predict(X_test), s = 1, cmap = color)
