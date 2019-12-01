@@ -83,10 +83,10 @@ class activelearning(EvalC, Kernels, loss, tau):
     
 #%%
 
-online = activelearning().fit(X_train, Y_train)
-online.predict(X_test)
-plt.scatter(X_test[:, 0], X_test[:, 1], c = online.predict(X_test))
-
+#online = activelearning().fit(X_train, Y_train)
+#online.predict(X_test)
+#plt.scatter(X_test[:, 0], X_test[:, 1], c = online.predict(X_test))
+#
 
 
 
