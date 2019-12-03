@@ -15,7 +15,10 @@ from tau_update import tau
 
 class activelearning(EvalC, Kernels, loss, tau):
     def __init__(self):
-        
+        '''Online Passive-Aggressive Active learning
+        :Reference:
+            https://link.springer.com/content/pdf/10.1007%2Fs10994-016-5555-y.pdf
+        '''
         return
     
     
