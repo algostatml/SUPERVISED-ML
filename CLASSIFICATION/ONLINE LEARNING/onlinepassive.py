@@ -14,6 +14,10 @@ from tau_update import tau
 
 class passiveAggr(EvalC, Kernels, loss, tau):
     def __init__(self):
+        '''Implementation of the Online Passive Aggressive Algorithm
+        :Reference:
+            http://jmlr.csail.mit.edu/papers/volume7/crammer06a/crammer06a.pdf
+        '''
         return
     
     
