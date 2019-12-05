@@ -13,14 +13,31 @@ from Utils.Loss import loss
 from tau_update import tau
 
 class passiveAggr(EvalC, Kernels, loss, tau):
-    def __init__(self):
+    def __init__(self, tau_update = None, C = None):
         '''Implementation of the Online Passive Aggressive Algorithm
         :Reference:
             http://jmlr.csail.mit.edu/papers/volume7/crammer06a/crammer06a.pdf
         '''
+        if not C:
+            C = .1
+            self.C = C
+        else:
+            self.C = C
+        if not tau_update:
+            tau_update = 'classic'
+            self.tau_update = tau_update
+        else:
+            self.tau_update = tau_update
         return
     
-    
+    def updatetau(self, x, loss):
+        if self.tau_update == 'classic':
+            return tau.classic(x, loss)
+        elif self.tau_update == 'f1_relax':
+            return tau.f1_relax(x, loss, self.C)
+        elif self.tau_update == 'f2_relax':
+            return tau.f2_relax(x, loss, self.C)
+        
     @staticmethod
     def activation(X, y, beta):
         '''
@@ -53,13 +70,15 @@ class passiveAggr(EvalC, Kernels, loss, tau):
         '''
         self.beta = np.zeros(X.shape[1])
         self.pred = np.zeros(len(Y))
+        self.counter = 0
         for ij, (x_i, y_i) in enumerate(zip(X, Y)):
             self.pred[ij] = self.pred_update(x_i, self.beta)
             self.l_t = passiveAggr.activation(x_i, y_i, self.beta)
             print(f'Cost of computation/Loss: {self.cost(x_i, y_i, self.beta)}')
-            self.t_t = tau.classic(x_i, self.l_t)
+            self.t_t = self.updatetau(x_i, self.l_t)
             if self.pred[ij] != y_i:
                 self.beta = self.beta + self.t_t * y_i * x_i
+                self.counter += 1
         return self
     
     def predict(self, X):
