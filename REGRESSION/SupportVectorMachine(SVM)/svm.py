@@ -20,7 +20,7 @@ class linearSVM(EvalC, loss):
                     Default value is 1.0.
         '''
         if not C:
-            C = .01
+            C = .1
             self.C = C
         else:
             self.C = C
@@ -46,12 +46,12 @@ class linearSVM(EvalC, loss):
         
     def fit(self, X, y, alpha:float = None, iterations:int = None, earlystoping = None):
         if not alpha:
-            alpha = 1e-5
+            alpha = 1e-3
             self.alpha = alpha
         else:
             self.alpha = alpha
         if not iterations:
-            iterations = 500
+            iterations = 2
             self.iterations = iterations
         else:
             self.iterations = iterations
@@ -81,10 +81,7 @@ class linearSVM(EvalC, loss):
         return self
     
     def predict(self, X):
-        yhat:int = np.zeros(X.shape[0])
-        for enum, ii in enumerate(np.sign(X.dot(self.beta) + self.b)):
-            if ii >0:
-                yhat[enum] = 1
+        yhat:int = np.sign(X.dot(self.beta) + self.b)
         return yhat
     
 
@@ -148,7 +145,7 @@ class StochasticlinearSVM(EvalC, loss):
                 y_samp = y[:random_samples]
                 self.margin = self.margins(X_samp, y_samp, self.beta, self.b)
                 #adjust parameters according to misclafication
-                indices = np.where(self.margin < 1)
+                indices = np.where(self.margin < 1)[0]
                 self.beta = self.beta - self.alpha*(self.beta - self.C * y_samp[indices].dot(X_samp[indices]))
                 self.b = self.b - self.alpha * self.C * np.sum(y_samp[indices])
                 self.beta_rec[ii, :] = self.beta.T
@@ -175,8 +172,9 @@ class StochasticlinearSVM(EvalC, loss):
 #X, y = make_moons(n_samples=1000, noise=.1)
 #X, y = make_blobs(n_samples=1000, centers=2, n_features=2)
 #X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = 0.3)
-#lsvm = linearSVM().fit(X_train, Y_train)
-#lsvm.predict(X_test)
+#lsvm = linearSVM(C = 0.1).fit(np.array(combine), np.array(y))
+#lsvm_pred = lsvm.predict(np.array(test_x))
+#lsvm.summary(np.array(test_y), lsvm_pred)
 #plt.scatter(X_test[:, 0], X_test[:, 1], c = lsvm.predict(X_test))
 #np.mean(lsvm.predict(X_test) == Y_test)
 #plt.plot(np.arange(lsvm.iterations), lsvm.cost_rec)
