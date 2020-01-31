@@ -26,7 +26,7 @@ class kDualSVM(EvalC, loss, Kernels):
         else:
             self.kernel = kernel
         if not C:
-            C = .01
+            C = .1
             self.C = C
         else:
             self.C = C
