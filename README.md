@@ -45,3 +45,8 @@ Supervised machine learning algorithms explained with code
 
 ##### Maximum margin classifier as it is commonly referred is a powerful discriminative classification algorithm. Its objective is to find data points that best seperates the data into distinctive classes. Using the data points the SVM algorithm established the optimumm margin for classification. SVM is also able to accurately classify non-linear data using the kernel trick.
 ----------------------
+
+##### K-Nearest Neighbors (KNN) | [code](https://github.com/algostatml/SUPERVISED-ML/blob/master/CLASSIFICATION/KNN/KNN.py)
+
+##### It is a non-parametric and lazy learning algorithm, meaning it does not make any assumptions about the underlying data distribution and does not build an explicit model during the training phase. The prediction for a new data point is made based on the majority class of its k nearest neighbors in the feature space. The distance metric (e.g., Euclidean, Lorentzian, Manhattan, Minkowski) is used to measure the similarity between data points. The value of k is a hyperparameter that determines the number of neighbors to consider; a small k may lead to a noisy decision boundary, while a large k may cause the algorithm to lose sensitivity to local patterns.
+
